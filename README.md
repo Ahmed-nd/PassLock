@@ -9,6 +9,7 @@ Features include:
 * Generate Password
 * Password Encryption 
 ## Download
+## Developers 
 ## License
 
     Copyright 2021
