@@ -12,6 +12,7 @@ class Window(tk.Frame):
         self.master = master
         self.master.iconbitmap('images/btn exit.png')
         self.master.title("PassLock")
+        self.master.geometry("800x600")
 
         def signup(self_signup):
 
@@ -63,8 +64,6 @@ class Window(tk.Frame):
         def login(self_login):
 
             self_login.master.resizable(0, 0)
-            self_login.master.state('normal')
-            self_login.master.geometry("800x600")
             # background
             # Add image file
             self_login.master.bg = tk.PhotoImage(file="images/login-page.png")
@@ -94,12 +93,7 @@ class Window(tk.Frame):
             password_label.place(x=180, y=350, width=180, height=21)
             password_entry.place(x=320, y=350, width=200, height=21)
 
-            # self.img = tk.PhotoImage(file="images/reset password.png")
-            # btn_add_folder = tk.Button(image=self.img, width=96, height=17,
-            #                            command=change_reset, border="0")
-            # btn_add_folder.place(x=500, y=405)
-
-            btn_reset_pass = tk.Button(text="Reset Password", font="Sans 13 bold", bg='#0001e6', fg="white",
+            btn_reset_pass = tk.Button(text="Reset Password", font="Sans 12 bold", bg='#0001e6', fg="white",
                                        command=change_reset, activebackground='#0001e6', activeforeground="white",
                                        border="0")
             btn_reset_pass.place(x=500, y=400)
@@ -111,8 +105,6 @@ class Window(tk.Frame):
         def reset_pass(self_reset):
 
             self_reset.master.resizable(0, 0)
-            self_reset.master.state('normal')
-            self_reset.master.geometry("800x600")
             # background
             # Add image file
             self_reset.master.bg = tk.PhotoImage(file="images/reset password page.png")
@@ -171,7 +163,7 @@ class Window(tk.Frame):
 
             self_app.master.resizable(1, 1)
             self_app.master.geometry("800x600")
-            self_app.master.state('zoomed')
+            # self_app.master.state('zoomed')
             # background
             # Add image file
             self_app.master.bg = tk.PhotoImage(file="images/app.png")

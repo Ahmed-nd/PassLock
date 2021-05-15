@@ -1,7 +1,7 @@
 # PassLock
 ---
 ## introduction 
-PassLock is a Free and open-source password manager for windows 10
+PassLock is a Free and open-source password manager for Windows 10
 
 ## Features
 Features include:
