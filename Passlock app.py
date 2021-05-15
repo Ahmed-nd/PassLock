@@ -5,20 +5,19 @@ from tkinter import filedialog, Menu
 from tkinter import messagebox
 from tkinter import ttk
 # AES 256 encryption/decryption using pycryptodome library
-# pip install pycryptodomex
-# pip install pycryptodome
 from base64 import b64encode, b64decode
 import hashlib
 from Cryptodome.Cipher import AES
-import os
 from Cryptodome.Random import get_random_bytes
+# pip install pycryptodomex
+# pip install pycryptodome
 
 
 class Window(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.master = master
-        self.master.iconbitmap('images/btn exit.png')
+        self.master.iconbitmap('images/icon.ico')
         self.master.title("PassLock")
         self.master.geometry("800x600")
 
@@ -106,9 +105,9 @@ class Window(tk.Frame):
                                        border="0")
             btn_reset_pass.place(x=500, y=400)
 
-            btn_enter = tk.Button(text="Enter", font="Sans 10 bold", width=10,
-                                  command=change_app, fg="white", bg="#0001a7")
-            btn_enter.place(x=350, y=400, height=25)
+            btn_enter = tk.Button(text="Enter", font="Sans 10 bold", width=10, fg="white", bg="#0001a7",
+                                  command=change_app, activebackground='#0001c6', activeforeground="white")
+            btn_enter.place(x=350, y=400, height=30)
 
         def reset_pass(self_reset):
 
@@ -170,7 +169,7 @@ class Window(tk.Frame):
         def application(self_app):
 
             self_app.master.resizable(1, 1)
-            self_app.master.geometry("800x600")
+            self_app.master.geometry("1000x700")
             # self_app.master.state('zoomed')
             # background
             # Add image file
@@ -268,7 +267,7 @@ class Window(tk.Frame):
         cipher_config = AES.new(private_key, AES.MODE_GCM)
 
         # return a dictionary with the encrypted text
-        cipher_text, tag = cipher_config.encrypt_and_digest(bytes(self, 'utf-8'))
+        cipher_text, tag = cipher_config.encrypt_and_digest(bytes(str(self), 'utf-8'))
         return {
             'cipher_text': b64encode(cipher_text).decode('utf-8'),
             'salt': b64encode(salt).decode('utf-8'),
