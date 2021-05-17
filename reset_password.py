@@ -9,38 +9,49 @@ class ResetPassword(tk.Frame):
         self.master = master
         self.master.iconbitmap('images/icon.ico')
         self.master.title("PassLock")
-        self.master.geometry("800x600")
+        self.master.geometry("500x500")
         self.master.resizable(0, 0)
-        # background
+        # ---------------------------frame1
+        self.frame1 = tk.Frame(self.master, bg="pale turquoise", relief="ridge")
+        self.frame1.pack(side="top", expand='true', fill='both', anchor='c')
+        # ---------------------------title label
+        self.title_label = tk.Label(self.frame1, text="Recovery", font="Arial 20 bold", bg="pale turquoise")
+        self.title_label.grid(row=1, column=0, columnspan=2, sticky='n', pady=40)
+        # ---------------------------image
         # Add image file
-        self.bg = tk.PhotoImage(file="images/reset password page.png")
-        bg_label3 = tk.Label(image=self.bg)
-        bg_label3.place(x=-2, y=-2)
+        self.img = tk.PhotoImage(file="images/logo.png")
+        # ---------------------------canvas
+        self.canvas = tk.Canvas(self.frame1, height=110, bg="white", width=500)
+        self.canvas.grid(row=0, column=0, columnspan=2)
+        self.canvas.create_image(250, 60, image=self.img)
+        # ---------------------------Program UI
 
-        # Program UI
+        self.key_label = tk.Label(self.frame1, text="                                              Key:",
+                                  font="Arial 10 bold", bg="pale turquoise")
+        self.key_entry = tk.Entry(self.frame1, width=25)
 
-        self.key_label = tk.Label(text="                    Key", font="Sans 13", bg="#0001e6")
-        self.key_entry = tk.Entry(width=30)
+        self.new_password_label = tk.Label(self.frame1, text="                             New password:",
+                                           font="Arial 10 bold", bg="pale turquoise")
+        self.new_password_entry = tk.Entry(self.frame1, width=25, show="*")
 
-        self.new_password_label = tk.Label(text="     New password", font="Sans 13", bg="#0001e6")
-        self.new_password_entry = tk.Entry(width=25, show="*")
-
-        self.confirm_label = tk.Label(text="Confirm password", font="Sans 13", bg="#0001e6")
-        self.confirm_entry = tk.Entry(width=25, show="*")
+        self.confirm_label = tk.Label(self.frame1, text="                        Confirm password:",
+                                      font="Arial 10 bold", bg="pale turquoise")
+        self.confirm_entry = tk.Entry(self.frame1, width=25, show="*")
 
         # n, e, s, w, ne, se, sw, nw
-        self.key_label.place(x=180, y=320, width=130, height=21)
-        self.key_entry.place(x=320, y=320, width=200, height=21)
+        self.key_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
+        self.key_entry.grid(row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
-        self.new_password_label.place(x=180, y=350, width=130, height=21)
-        self.new_password_entry.place(x=320, y=350, width=200, height=21)
+        self.new_password_label.grid(row=3, column=0, columnspan=2, sticky='w', pady=10)
+        self.new_password_entry.grid(row=3, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
-        self.confirm_label.place(x=180, y=380, width=130, height=21)
-        self.confirm_entry.place(x=320, y=380, width=200, height=21)
+        self.confirm_label.grid(row=4, column=0, columnspan=2, sticky='w', pady=10)
+        self.confirm_entry.grid(row=4, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
-        btn_enter = tk.Button(text="Enter", font="Sans 10 bold", width=10,
-                              command=self.change, bg="#0001a7", fg="white")
-        btn_enter.place(x=350, y=430, height=25)
+        btn_enter = tk.Button(self.frame1, text="Enter", font="Arial 10 bold", width=7,
+                              bg="#0001a7", fg='white', command=self.change,
+                              activeforeground='white', activebackground='#00dee1')
+        btn_enter.grid(row=5, column=0, columnspan=2, pady=20)
 
     def change(self):
         new_password = self.new_password_entry.get()

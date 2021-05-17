@@ -13,12 +13,12 @@ class Application(tk.Frame):
         self.master.title("PassLock")
         self.master.geometry("1000x700")
         self.master.resizable(1, 1)
-        # self_app.master.state('zoomed')
+        # self.master.state('zoomed')
         # background
         # Add image file
-        self.bg = tk.PhotoImage(file="images/app.png")
-        bg_label2 = tk.Label(image=self.bg)
-        bg_label2.place(x=-2, y=-2)
+        # self.bg = tk.PhotoImage(file="images/app.png")
+        # bg_label2 = tk.Label(image=self.bg)
+        # bg_label2.place(x=-2, y=-2)
         self.menu_bar = tk.Menu()
 
         self.file_menu_items = tk.Menu(self.menu_bar, tearoff=0)
