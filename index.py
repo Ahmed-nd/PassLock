@@ -30,7 +30,7 @@ padx, pady, text, textvariable, underline, width, wraplength)
 Entry(relief="raised, flat, groove, ridge, sunken")."get, insert(0, String)"
 """
 """
-Button(command)
+Button(command,state="active, disabled, or normal")
 """
 """
 grid(row, column, columnspan)

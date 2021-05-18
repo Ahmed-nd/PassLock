@@ -10,6 +10,8 @@ from base64 import b64encode, b64decode
 import hashlib
 from Cryptodome.Cipher import AES
 from Cryptodome.Random import get_random_bytes
+
+
 # pip install pycryptodomex
 # pip install pycryptodome
 
@@ -29,8 +31,8 @@ class Application(tk.Frame):
 
         self.file_menu_items = tk.Menu(self.menu_bar, tearoff=0)
 
-        self.file_menu_items.add_command(label="All Items", command=self.open_file)
-        self.file_menu_items.add_command(label="Settings...", command=self.open_file)
+        self.file_menu_items.add_command(label="All Items", command=self.open_tools)
+        self.file_menu_items.add_command(label="Settings...", command=self.open_tools)
         self.file_menu_items.add_separator()
 
         self.file_menu_items.add_command(label="Exit", command=self.master.destroy)
@@ -59,77 +61,78 @@ class Application(tk.Frame):
         self.menu_bar.add_cascade(label="Tools", menu=self.tools_menu_items)
         self.menu_bar.add_cascade(label="Help", menu=self.help_menu_items)
         self.master.config(menu=self.menu_bar)
-        # ---------------------------frame1
-        # self.frame1 = tk.Frame(self.master, bg="lemon chiffon", relief="ridge", height=40, borderwidth=5)
-        # self.frame1.pack(side="left", fill='both', anchor='c')
-        # ---------------------------frame2
-        self.frame1 = tk.Frame(self.master, bg="antique white", relief="ridge", borderwidth=5, padx=30, pady=30)
-        self.frame1.pack(side="left", fill='both', anchor='c')
-        # ---------------------------frame3
-        self.frame2 = tk.Frame(self.master, bg="floral white", relief="ridge", borderwidth=5)
-        self.frame2.pack(side="left", expand='true', fill='both', anchor='c')
-        # ---------------------------Notebook
 
-        # ---------------------------label
-        # self.title_label = tk.Label(self.frame1, text="Sign up", font="Arial 18 bold", bg="pale turquoise")
-        # self.title_label.grid(row=0, column=0, columnspan=2, sticky='n', pady=40)
-        self.title_label = tk.Label(self.frame2, text="Sign up", font="Arial 18 bold", bg="pale turquoise")
-        self.title_label.grid(row=0, column=0, columnspan=2, sticky='n', pady=40)
-        self.title_label = tk.Label(self.frame2, text="Sign up", font="Arial 18 bold", bg="pale turquoise")
-        self.title_label.grid(row=1, column=0, columnspan=2, sticky='n', pady=40)
+        # ---------------------------frame left
+        self.frame_left = tk.Frame(self.master, bg="antique white", relief="groove", borderwidth=5, padx=30, pady=30)
+        self.frame_left.pack(side="left", fill='both', anchor='c')
+        # ---------------------------frame right
+        self.frame_right = tk.Frame(self.master, bg="floral white", relief="groove", borderwidth=5)
+        self.frame_right.pack(side="left", expand='true', fill='both', anchor='c')
+        # ---------------------------frame1 space-----------------------------
+        self.frame_right_inner0 = tk.Frame(self.frame_right, bg="floral white", borderwidth=0)
+        self.frame_right_inner0.pack(side="top", expand='true')
+        # ---------------------------frame1
+        self.frame_right_inner1 = tk.Frame(self.frame_right, bg="floral white", borderwidth=0, padx=22)
+        self.frame_right_inner1.pack(side="top", fill='both', anchor='c')
+        # ---------------------------frame2
+        self.frame_right_inner2 = tk.Frame(self.frame_right, bg="lemon chiffon", relief="ridge", borderwidth=4,
+                                           padx=30, pady=30)
+        # ------------------------------Scroll bar
+        self.scrollbar = tk.Scrollbar(self.frame_right_inner2, orient="vertical")
+        self.scrollbar.pack(side="right", fill='y')
+        self.frame_right_inner2.pack(side="top", expand='true', fill='both', anchor='c', padx=20, ipady=270)
+        # ---------------------------frame2 space-------------------------------
+        self.frame_right_inner3 = tk.Frame(self.frame_right, bg="floral white", borderwidth=0)
+        self.frame_right_inner3.pack(side="bottom", expand='true')
 
         # ------------------------------left
-        btn_enter = tk.Button(self.frame1, text="All items", font="Arial 10 bold", border=0,
+        btn_enter = tk.Button(self.frame_left, text="All items", font="Arial 10 bold", border=0,
                               bg="antique white", activebackground='antique white')
         btn_enter.grid(row=0, column=0, columnspan=2, sticky='n', pady=10)
-        btn_enter = tk.Button(self.frame1, text="Auto Fill", font="Arial 10 bold", border=0,
+        btn_enter = tk.Button(self.frame_left, text="Auto Fill", font="Arial 10 bold", border=0,
                               bg="antique white", activebackground='antique white')
         btn_enter.grid(row=1, column=0, columnspan=2, sticky='n', pady=10)
-        btn_enter = tk.Button(self.frame1, text="Generate\nPassword", font="Arial 10 bold", border=0,
+        btn_enter = tk.Button(self.frame_left, text="Generate\nPassword", font="Arial 10 bold", border=0,
                               bg="antique white", activebackground='antique white')
         btn_enter.grid(row=2, column=0, columnspan=2, sticky='n', pady=10)
-        btn_enter = tk.Button(self.frame1, text="Auto Fill", font="Arial 10 bold", border=0,
+        btn_enter = tk.Button(self.frame_left, text="Setting", font="Arial 10 bold", border=0,
                               bg="antique white", activebackground='antique white')
         btn_enter.grid(row=3, column=0, columnspan=2, sticky='n', pady=10)
-        btn_enter = tk.Button(self.frame1, text="About", command=lambda link=about_url: self.open_url(link)
+        btn_enter = tk.Button(self.frame_left, text="About", command=lambda link=about_url: self.open_url(link)
                               , font="Arial 10 bold", border=0,
                               bg="antique white", activebackground='antique white')
         btn_enter.grid(row=4, column=0, columnspan=2, sticky='n', pady=10)
         # ------------------------------right
         # ------------------------------Add folder btn
-        self.img = tk.PhotoImage(file="images/btn add folder hover.png")
-        self.btn_add_folder = tk.Button(self.frame2, image=self.img, width=279, command=self.add_folder,
-                                        height=40, border="0", bg="floral white", activebackground='floral white')
-        self.btn_add_folder.grid(row=2, column=1, columnspan=2, sticky='s', pady=10, padx=50)
+        btn_enter = tk.Button(self.frame_right_inner1, text="+", font="Arial 12 bold", border=2, width=2,
+                              relief='groove', bg="lawn green", activebackground='green2',
+                              command=self.add_folder)
+        btn_enter.grid(row=0, column=0)
+        btn_enter = tk.Button(self.frame_right_inner1, text="-", font="Arial 12 bold", relief='groove',
+                              border=2, width=2, fg='white', bg="red", activebackground='red2',
+                              activeforeground='white', state='normal', command=self.remove_folder)
+        btn_enter.grid(row=0, column=1)
 
-        self.btn_add_folder.bind("<ButtonPress>", self.btn_add_folder_press)
-        self.btn_add_folder.bind("<ButtonRelease>", self.btn_add_folder_release)
+        # self.frame_right_inner2['yscrollcommand'] = scrollbar.set
 
     # Function Backend
-
-    # Program UI
-    def open_file(self):
-        filename = filedialog.askopenfilename(initialdir="C:/Users/ahmed/OneDrive/Desktop/", title="Open File",
-                                              filetypes=(("Text Files", "*.txt"), ("All Files", "*.*")))
-        print("File Open" + filename)
-
     def open_tools(self):
         print("Tools Open")
 
     def add_folder(self):
         print("Add folder")
+        tmp_frame = tk.Frame(self.frame_right_inner2, bg="lemon chiffon", relief="ridge", border=2,
+                             padx=30, pady=10, height=10)
+        tmp_frame.pack(side="top", fill='both', anchor='c')
+        number = tk.Label(tmp_frame, text='0', border=2, width=5, font="Arial 12 bold", relief='groove')
+        number.grid(row=0, column=0)
+        btn_enter = tk.Button(tmp_frame, text="Ahmed Nasser", font="Arial 12 bold", relief='groove',
+                              border=2, width=30, bg="antique white", activebackground='antique white', anchor='w',
+                              activeforeground='black', state='normal')
+        btn_enter.grid(row=0, column=1)
 
-    def btn_add_folder_press(self, _):
-        self.img = tk.PhotoImage(file="images/btn add folder.png")
-        self.btn_add_folder.config(image=self.img)
-
-    def btn_add_folder_release(self, _):
-        self.img = tk.PhotoImage(file="images/btn add folder hover.png")
-        self.btn_add_folder.config(image=self.img)
-
-    @staticmethod
-    def exit_program(self):
-        self.exit()
+    def remove_folder(self):
+        print("remove folder")
 
     @staticmethod
     def open_url(self):
