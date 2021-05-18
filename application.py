@@ -80,7 +80,7 @@ class Application(tk.Frame):
         # ------------------------------Scroll bar
         self.scrollbar = tk.Scrollbar(self.frame_right_inner2, orient="vertical")
         self.scrollbar.pack(side="right", fill='y')
-        self.frame_right_inner2.pack(side="top", expand='true', fill='both', anchor='c', padx=20, ipady=270)
+        self.frame_right_inner2.pack(side="top", expand='true', fill='both', anchor='c', padx=20, ipady=200)
         # ---------------------------frame2 space-------------------------------
         self.frame_right_inner3 = tk.Frame(self.frame_right, bg="floral white", borderwidth=0)
         self.frame_right_inner3.pack(side="bottom", expand='true')
