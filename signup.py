@@ -43,8 +43,10 @@ class Signup(tk.Frame):
                                    bg="#0001a7", fg='white', command=self.change,
                                    activeforeground='white', activebackground='#00dee1')
         self.btn_enter.grid(row=4, column=0, columnspan=2, pady=20)
+        # -------------------------------Events
+        self.master.bind('<Return>', self.change)
 
-    def change(self):
+    def change(self, *_):
         new_password = self.new_password_entry.get()
         confirm = self.confirm_entry.get()
         if len(new_password) == 0:

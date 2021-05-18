@@ -42,8 +42,10 @@ class Login(tk.Frame):
                                         command=self.change_reset, activebackground='#0001e6', activeforeground="white",
                                         border="0")
         self.btn_reset_pass.grid(row=4, column=0, columnspan=2, pady=10)
+        # -------------------------------Events
+        self.master.bind('<Return>', self.change_app)
 
-    def change_app(self):
+    def change_app(self, *_):
         self.master.destroy()
         os.system('python application.py')
 
