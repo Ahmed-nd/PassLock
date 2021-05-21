@@ -77,6 +77,7 @@ class Application(tk.Frame):
         # ---------------------------frame2
         self.frame_right_inner2 = tk.Frame(self.frame_right, bg="lemon chiffon", relief="ridge", borderwidth=4,
                                            padx=30, pady=30)
+        self.frame_right_inner2.pack(side="top", expand='true')
         # ------------------------------Scroll bar
         self.scrollbar = tk.Scrollbar(self.frame_right_inner2, orient="vertical")
         self.scrollbar.pack(side="right", fill='y')

@@ -17,7 +17,8 @@ class Login(tk.Frame):
         self.frame1 = tk.Frame(self.master, bg="pale turquoise", relief="ridge")
         self.frame1.pack(side="top", expand='true', fill='both', anchor='c')
         # ---------------------------title label
-        self.title_label = tk.Label(self.frame1, text="Login", font="Arial 20 bold", bg="pale turquoise")
+        self.title_label = tk.Label(self.frame1, text="Login", font="Impact 30 bold",
+                                    bg="pale turquoise")
         self.title_label.grid(row=1, column=0, columnspan=2, sticky='n', pady=40)
         # ---------------------------image
         # Add image file
@@ -28,22 +29,24 @@ class Login(tk.Frame):
         self.canvas.create_image(250, 60, image=self.img)
         # ---------------------------Program UI
         self.password_label = tk.Label(self.frame1, text="                                "
-                                                         "    Password:", font="Arial 10 bold", bg="pale turquoise")
+                                                         "    Password:", font=("Goudy old style", 10, "bold"),
+                                       bg="pale turquoise")
         self.password_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.password)
 
         self.password_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
         self.password_entry.grid(row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
-        self.btn_enter = tk.Button(self.frame1, text="Enter", font="Arial 10 bold", width=7,
-                                   bg="#0001a7", fg='white', command=self.change_app,
-                                   activeforeground='white', activebackground='#00dee1')
-        self.btn_enter.grid(row=3, column=0, columnspan=2, pady=20)
-
         self.btn_reset_pass = tk.Button(self.frame1, text="Forgot your password?", font="Arial 10",
                                         bg='pale turquoise',
                                         command=self.change_reset, activebackground='#0001e6', activeforeground="white",
                                         border="0")
-        self.btn_reset_pass.grid(row=4, column=0, columnspan=2, pady=10)
+        self.btn_reset_pass.grid(row=3, column=0, columnspan=2, pady=7)
+
+        self.btn_enter = tk.Button(self.frame1, text="Enter", font="Arial 10 bold", width=7,
+                                   bg="#0001a7", fg='white', command=self.change_app,
+                                   activeforeground='white', activebackground='#00dee1')
+        self.btn_enter.grid(row=4, column=0, columnspan=2, pady=14)
+
         # -------------------------------Events
         self.master.bind('<Return>', self.change_app)
 
