@@ -11,6 +11,8 @@ class Login(tk.Frame):
         self.master.title("PassLock")
         self.master.geometry("500x500")
         self.master.resizable(0, 0)
+        # ---------------------------StringVar
+        self.password = tk.StringVar()
         # ---------------------------frame1
         self.frame1 = tk.Frame(self.master, bg="pale turquoise", relief="ridge")
         self.frame1.pack(side="top", expand='true', fill='both', anchor='c')
@@ -27,7 +29,7 @@ class Login(tk.Frame):
         # ---------------------------Program UI
         self.password_label = tk.Label(self.frame1, text="                                "
                                                          "    Password:", font="Arial 10 bold", bg="pale turquoise")
-        self.password_entry = tk.Entry(self.frame1, width=25, show="*")
+        self.password_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.password)
 
         self.password_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
         self.password_entry.grid(row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
@@ -46,8 +48,18 @@ class Login(tk.Frame):
         self.master.bind('<Return>', self.change_app)
 
     def change_app(self, *_):
-        self.master.destroy()
-        os.system('python application.py')
+        password = self.password.get()
+        file = open('password.txt', 'r')
+        file.seek(0, 0)
+        content = file.read()
+        if content != '':
+            if password == content:
+                self.master.destroy()
+                os.system('python application.py')
+            else:
+                messagebox.showerror("Error", "Wrong password")
+        else:
+            messagebox.showerror("Error", "there is a problem with the account file")
 
     def change_reset(self):
         self.master.destroy()

@@ -11,6 +11,10 @@ class ResetPassword(tk.Frame):
         self.master.title("PassLock")
         self.master.geometry("500x500")
         self.master.resizable(0, 0)
+        # ---------------------------StringVar
+        self.key = tk.StringVar()
+        self.new_password = tk.StringVar()
+        self.confirm = tk.StringVar()
         # ---------------------------frame1
         self.frame1 = tk.Frame(self.master, bg="pale turquoise", relief="ridge")
         self.frame1.pack(side="top", expand='true', fill='both', anchor='c')
@@ -28,15 +32,15 @@ class ResetPassword(tk.Frame):
 
         self.key_label = tk.Label(self.frame1, text="                                              Key:",
                                   font="Arial 10 bold", bg="pale turquoise")
-        self.key_entry = tk.Entry(self.frame1, width=25)
+        self.key_entry = tk.Entry(self.frame1, width=25, textvariable=self.key)
 
         self.new_password_label = tk.Label(self.frame1, text="                             New password:",
                                            font="Arial 10 bold", bg="pale turquoise")
-        self.new_password_entry = tk.Entry(self.frame1, width=25, show="*")
+        self.new_password_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.new_password)
 
         self.confirm_label = tk.Label(self.frame1, text="                        Confirm password:",
                                       font="Arial 10 bold", bg="pale turquoise")
-        self.confirm_entry = tk.Entry(self.frame1, width=25, show="*")
+        self.confirm_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.confirm)
 
         # n, e, s, w, ne, se, sw, nw
         self.key_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
@@ -56,12 +60,16 @@ class ResetPassword(tk.Frame):
         self.master.bind('<Return>', self.change)
 
     def change(self, *_):
-        new_password = self.new_password_entry.get()
-        confirm = self.confirm_entry.get()
+        new_password = self.new_password.get()
+        confirm = self.confirm.get()
+        print(new_password, confirm)
         if len(new_password) == 0:
             messagebox.showerror("Error", "Enter your password")
         elif new_password == confirm and len(new_password) >= 8:
             # store the new password in Database
+            file = open('password.txt', 'w')
+            file.seek(0, 0)
+            file.write(new_password)
             self.master.destroy()
             os.system('python login.py')
             # bgLabel.destroy()
