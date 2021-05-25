@@ -11,9 +11,10 @@ class Index(tk.Frame):
         self.master.title("PassLock")
         self.master.geometry("800x600")
         self.master.destroy()
-        with open('password.txt', 'r') as reader:
-            line = reader.readline()
-        if line == '':
+        file = open('password.txt', 'r')
+        file.seek(0, 0)
+        content = file.read()
+        if content == '':
             os.system('python signup.py')
         else:
             os.system('python login.py')

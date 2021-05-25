@@ -143,6 +143,8 @@ class Application(tk.Frame):
         self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
                                  relief='groove', bg="lawn green", activebackground='green2',
                                  command=self.add_new_folder)
+        if total_rows == 12:
+            self.btn_add['state'] = 'disable'
         self.btn_add.grid(row=total_rows - 1, column=total_columns + 1)
 
     def destroy_table(self):
@@ -190,45 +192,43 @@ class Application(tk.Frame):
         total_rows = len(self.lst)
         del self.folder_name
         self.folder_name = tk.StringVar()
-        if total_rows < 13:
-            def add():
-                print("add")
-                name = self.folder_name.get()
-                if name != '':
-                    temp_lst = [name, self.lst[0][1], self.lst[0][2], self.lst[0][3]]
-                    temp_lst = tuple(temp_lst)
-                    self.lst.append(temp_lst)
-                    self.destroy_table()
-                else:
-                    messagebox.showerror("Error", "Enter folder name")
 
-            def back():
-                print("remove folder")
-                folder_name_label.destroy()
-                folder_name_entry.destroy()
-                self.btn_add.destroy()
-                btn_remove.destroy()
-                self.show_table()
+        def add():
+            print("add")
+            name = self.folder_name.get()
+            if name != '':
+                temp_lst = [name, self.lst[0][1], self.lst[0][2], self.lst[0][3]]
+                temp_lst = tuple(temp_lst)
+                self.lst.append(temp_lst)
+                self.destroy_table()
+            else:
+                messagebox.showerror("PassLock", "Enter folder name")
 
+        def back():
+            print("remove folder")
+            folder_name_label.destroy()
+            folder_name_entry.destroy()
             self.btn_add.destroy()
+            btn_remove.destroy()
+            self.show_table()
 
-            folder_name_label = tk.Label(self.tab1, text="Name :", font="Arial 12 bold", relief='groove',
-                                         width=5, bg='floral white', border=0)
-            folder_name_label.grid(row=total_rows, column=0, padx=2, pady=2)
-            folder_name_entry = tk.Entry(self.tab1, width=self.wid[0] + 3, font="Arial 12 bold", relief='groove',
-                                         textvariable=self.folder_name)
-            folder_name_entry.grid(row=total_rows, column=1, padx=2, pady=2)
-            # ------------------------------Add folder btn
-            self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=self.wid[1],
-                                     relief='groove', bg="lawn green", activebackground='green2',
-                                     command=add)
-            self.btn_add.grid(row=total_rows, column=2)
-            btn_remove = tk.Button(self.tab1, text="-", font="Arial 12 bold", relief='groove',
-                                   border=2, width=self.wid[2], fg='white', bg="red", activebackground='red2',
-                                   activeforeground='white', state='normal', command=back)
-            btn_remove.grid(row=total_rows, column=3)
-        else:
-            messagebox.showerror("Error", "the maximum folder number is 12 please delete some")
+        self.btn_add.destroy()
+
+        folder_name_label = tk.Label(self.tab1, text="Name :", font="Arial 12 bold", relief='groove',
+                                     width=5, bg='floral white', border=0)
+        folder_name_label.grid(row=total_rows, column=0, padx=2, pady=2)
+        folder_name_entry = tk.Entry(self.tab1, width=self.wid[0] + 3, font="Arial 12 bold", relief='groove',
+                                     textvariable=self.folder_name)
+        folder_name_entry.grid(row=total_rows, column=1, padx=2, pady=2)
+        # ------------------------------Add folder btn
+        self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=self.wid[1],
+                                 relief='groove', bg="lawn green", activebackground='green2',
+                                 command=add)
+        self.btn_add.grid(row=total_rows, column=2)
+        btn_remove = tk.Button(self.tab1, text="-", font="Arial 12 bold", relief='groove',
+                               border=2, width=self.wid[2], fg='white', bg="red", activebackground='red2',
+                               activeforeground='white', state='normal', command=back)
+        btn_remove.grid(row=total_rows, column=3)
 
     @staticmethod
     def open_url(self):

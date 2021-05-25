@@ -64,7 +64,7 @@ class ResetPassword(tk.Frame):
         confirm = self.confirm.get()
         print(new_password, confirm)
         if len(new_password) == 0:
-            messagebox.showerror("Error", "Enter your password")
+            messagebox.showerror("PassLock", "Enter your password")
         elif new_password == confirm and len(new_password) >= 8:
             # store the new password in Database
             file = open('password.txt', 'w')
@@ -75,9 +75,9 @@ class ResetPassword(tk.Frame):
             # bgLabel.destroy()
             # return Login(self)
         elif new_password == confirm and len(new_password) < 8:
-            messagebox.showerror("Error", "Your password is less than 8 characters")
+            messagebox.showerror("PassLock Error", "Your password is less than 8 characters")
         else:
-            messagebox.showerror("Error", "Your password and confirmation password do not match")
+            messagebox.showerror("PassLock Error", "Your password and confirmation password do not match")
 
 
 if __name__ == "__main__":

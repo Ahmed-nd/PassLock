@@ -59,10 +59,12 @@ class Login(tk.Frame):
             if password == content:
                 self.master.destroy()
                 os.system('python application.py')
+            elif password == '':
+                messagebox.showerror("PassLock", "Enter your password")
             else:
-                messagebox.showerror("Error", "Wrong password")
+                messagebox.showerror("PassLock", "Wrong password")
         else:
-            messagebox.showerror("Error", "there is a problem with the account file")
+            messagebox.showerror("PassLock", "there is a problem with the account file")
 
     def change_reset(self):
         self.master.destroy()
