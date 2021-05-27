@@ -3,6 +3,16 @@ import tkinter as tk
 import os
 
 
+def save_password():
+    file = open('password.txt', 'r')
+    file.seek(0, 0)
+    content = file.read()
+    if content == '':
+        os.system('python signup.py')
+    else:
+        os.system('python login.py')
+
+
 class Index(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
@@ -11,13 +21,7 @@ class Index(tk.Frame):
         self.master.title("PassLock")
         self.master.geometry("800x600")
         self.master.destroy()
-        file = open('password.txt', 'r')
-        file.seek(0, 0)
-        content = file.read()
-        if content == '':
-            os.system('python signup.py')
-        else:
-            os.system('python login.py')
+        save_password()
         # signup(self)
 
 
