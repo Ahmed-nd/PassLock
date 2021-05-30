@@ -1,8 +1,6 @@
 import tkinter as tk
 import webbrowser
-from tkinter import scrolledtext, END
-import os
-from tkinter import filedialog, Menu
+from tkinter.messagebox import showinfo
 from tkinter import messagebox
 from tkinter import ttk
 # AES 256 encryption/decryption using pycryptodome library
@@ -258,9 +256,9 @@ class Application(tk.Frame):
                                ('Facebook', 'face12354.com', '231', 'Edit', 'Del'),
                                ('Bootcamp', 'Boot4453.com', '132', 'Edit', 'Del'),
                                ('Coursera', 'Cour1234.com', '312', 'Edit', 'Del')]
-            self.add_new_acc(self.lst[row][0])
+            self.show_account(self.lst[row][0])
 
-    def add_new_acc(self, account_fold_name):
+    def show_account(self, account_fold_name):
         def command(find):
             print('search :' + find)
         filename = tk.Label(self.tab1, text=account_fold_name + ":", width=10, bg='floral white',
@@ -310,7 +308,7 @@ class Application(tk.Frame):
             self.tab1.destroy()
             self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg='floral white')
             self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-            self.add_new_acc(account_fold_name)
+            self.show_account(account_fold_name)
         elif column == 3:
             del self.account_web
             del self.account_username
@@ -333,7 +331,7 @@ class Application(tk.Frame):
                     self.tab1.destroy()
                     self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg='floral white')
                     self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-                    self.add_new_acc(account_fold_name)
+                    self.show_account(account_fold_name)
                 else:
                     messagebox.showerror("PassLock", "Please Enter the data")
 
@@ -385,7 +383,7 @@ class Application(tk.Frame):
                 self.tab1.destroy()
                 self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg='floral white')
                 self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-                self.add_new_acc(account_fold_name)
+                self.show_account(account_fold_name)
             else:
                 messagebox.showerror("PassLock", "Please Enter the data")
 
@@ -394,7 +392,7 @@ class Application(tk.Frame):
             self.tab1.destroy()
             self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg='floral white')
             self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-            self.add_new_acc(account_fold_name)
+            self.show_account(account_fold_name)
 
         self.btn_add.destroy()
         # ------------------------web name
