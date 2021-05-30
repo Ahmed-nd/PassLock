@@ -10,8 +10,7 @@ from base64 import b64encode, b64decode
 import hashlib
 from Cryptodome.Cipher import AES
 from Cryptodome.Random import get_random_bytes
-
-
+import search
 # pip install pycryptodomex
 # pip install pycryptodome
 
@@ -122,9 +121,19 @@ class Application(tk.Frame):
 
     # Function Backend
     def show_table(self):
+        def command(find):
+            print('search:' + find)
         filename = tk.Label(self.tab1, text="Folders:", width=10, bg='floral white',
                             font="Times 26 bold", fg='gray20')
         filename.grid(row=0, column=0, pady=25)
+        search.SearchBox(self.tab1, command=command, placeholder="Type and press enter",
+                         entry_highlightthickness=0).grid(row=0, column=2, columnspan=3)
+        # folder_name_label = tk.Button(self.tab1, text="Search", font="Arial 12 bold",
+        #                               relief='groove', bg='pale turquoise')
+        # folder_name_label.grid(row=0, column=4, sticky='e', padx=5)
+        # folder_name_entry = tk.Entry(self.tab1, width=30, background="white", highlightcolor="#009688",
+        #                              highlightthickness=1,)
+        # folder_name_entry.grid(row=0, column=5, columnspan=6)
         del self.lst_tk
         self.lst_tk = []
         total_rows = len(self.lst)
@@ -199,12 +208,12 @@ class Application(tk.Frame):
                                      textvariable=self.folder_name)
         folder_name_entry.grid(row=total_rows + 1, column=1, padx=2, pady=2)
         # ------------------------------Add folder btn
-        self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=self.wid[1]+self.wid[2],
+        self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=self.wid[1] + self.wid[2],
                                  relief='groove', bg="lawn green", activebackground='green2',
                                  command=add)
         self.btn_add.grid(row=total_rows + 2, column=2, columnspan=3)
         btn_remove = tk.Button(self.tab1, text="-", font="Arial 12 bold", relief='groove',
-                               border=2, width=self.wid[1]+self.wid[2], fg='white', bg="red", activebackground='red2',
+                               border=2, width=self.wid[1] + self.wid[2], fg='white', bg="red", activebackground='red2',
                                activeforeground='white', state='normal', command=back)
         btn_remove.grid(row=total_rows + 1, column=2, columnspan=3, pady=10)
 
@@ -252,9 +261,13 @@ class Application(tk.Frame):
             self.add_new_acc(self.lst[row][0])
 
     def add_new_acc(self, account_fold_name):
+        def command(find):
+            print('search :' + find)
         filename = tk.Label(self.tab1, text=account_fold_name + ":", width=10, bg='floral white',
                             font="Times 26 bold", fg='gray20')
         filename.grid(row=0, column=0, pady=25)
+        search.SearchBox(self.tab1, command=command, placeholder="Type and press enter",
+                         entry_highlightthickness=0).grid(row=0, column=4, columnspan=4)
         del self.lst_tk
         self.lst_tk = []
         total_rows = len(self.folder_lst)
@@ -408,12 +421,12 @@ class Application(tk.Frame):
         folder_name_entry.grid(row=total_rows + 3, column=2, padx=2, pady=17, columnspan=2, sticky='w')
         # ------------------------------Add folder btn
         self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2,
-                                 width=self.folder_lst_wid[3]+self.folder_lst_wid[4] + 1,
+                                 width=self.folder_lst_wid[3] + self.folder_lst_wid[4] + 1,
                                  relief='groove', bg="lawn green", activebackground='green2',
                                  command=add)
         self.btn_add.grid(row=total_rows + 2, column=4, columnspan=4)
         btn_remove = tk.Button(self.tab1, text="-", font="Arial 12 bold", relief='groove',
-                               border=2, width=self.folder_lst_wid[3]+self.folder_lst_wid[4] + 1,
+                               border=2, width=self.folder_lst_wid[3] + self.folder_lst_wid[4] + 1,
                                fg='white', bg="red", activebackground='red2',
                                activeforeground='white', state='normal', command=back)
         btn_remove.grid(row=total_rows + 1, column=4, columnspan=4, pady=10)
