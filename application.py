@@ -64,14 +64,19 @@ class Application(tk.Frame):
         self.menu_bar.add_cascade(label="Help", menu=self.help_menu_items)
         self.master.config(menu=self.menu_bar)
 
+        # colors
+        self.frame_left_color = "#00dee1"
+        self.frame_right_color = "pale turquoise"
+        self.canvas_right_table_color = "floral white"
         # ---------------------------frame left
-        self.frame_left = tk.Frame(self.master, bg="#00dee1", relief="groove", borderwidth=5, padx=30, pady=30)
+
+        self.frame_left = tk.Frame(self.master, bg=self.frame_left_color, relief="groove", borderwidth=5, padx=30, pady=30)
         self.frame_left.pack(side="left", fill='both', anchor='c')
         # ---------------------------frame right
-        self.frame_right = tk.Frame(self.master, bg="pale turquoise", relief="groove", borderwidth=5, pady=30)
+        self.frame_right = tk.Frame(self.master, bg=self.frame_right_color, relief="groove", borderwidth=5, pady=30)
         self.frame_right.pack(side="left", expand='true', fill='both', anchor='c')
         # ---------------------------Canvas right table
-        self.canvas_right_table = tk.Canvas(self.frame_right, bg="floral white", relief="ridge",
+        self.canvas_right_table = tk.Canvas(self.frame_right, bg=self.canvas_right_table_color, relief="ridge",
                                             borderwidth=4)
         self.canvas_right_table.pack(side="top", fill='both', anchor='c', padx=30, expand='true')
         # ---------------------------Table
@@ -321,7 +326,7 @@ class Application(tk.Frame):
             temp_tk = []
             e = tk.Label(self.tab1, text=(i - 1), width=5, bg='cyan',
                          font="Arial 12 bold", relief='groove')
-            e.grid(row=i, column=1, padx=20, pady=2)
+            e.grid(row=i, column=1, padx=2, pady=2)
             temp_tk.append(e)
             for j in range(2, total_columns + 2):
                 if j < 5:
