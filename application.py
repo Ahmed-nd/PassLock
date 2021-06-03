@@ -716,9 +716,9 @@ class Application(tk.Frame):
         title_bar = tk.Frame(self.master, bg='#2e2e2e', relief='raised', bd=0, highlightthickness=0, pady=4, padx=4)
 
         def get_pos(event):
-
             def move_window(e):
                 self.master.geometry("1400x700" + '+{0}+{1}'.format(e.x_root + xwin, e.y_root + ywin))
+
             xwin = app.winfo_x()
             ywin = app.winfo_y()
             startx = event.x_root
@@ -797,8 +797,6 @@ class Application(tk.Frame):
         self.minimize_button.bind('<Enter>', changem_size_on_hovering)
         self.minimize_button.bind('<Button-1>', minimize_me)
         self.minimize_button.bind('<Leave>', returnm_size_on_hovering)
-
-
 
     # Backend
     def encrypt(self, password):
