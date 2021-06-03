@@ -24,15 +24,14 @@ class Application(tk.Frame):
         self.master = master
         self.master.iconbitmap('images/icon.ico')
         self.master.title("PassLock")
-        self.master.geometry("1000x700")
+        self.master.geometry("1500x700")
         self.master.resizable(1, 1)
-        self.master.state('zoomed')
+        # self.master.state('zoomed')
         # -------------------------------
         self.close_button = tk.Button()
         self.expand_button = tk.Button()
         self.minimize_button = tk.Button()
         self.title_bar_title = tk.Label()
-
         self.window = tk.Canvas(self.master)
 
         self.menu_bar()
@@ -656,7 +655,7 @@ class Application(tk.Frame):
                                pady=30)
         self.frame_left.pack(side="left", fill='both', anchor='c')
         # ---------------------------frame right
-        self.frame_right.config(bg=self.frame_right_color, relief="groove", borderwidth=5, pady=30)
+        self.frame_right.config(bg=self.frame_right_color, relief="groove", borderwidth=0, pady=30)
         self.frame_right.pack(side="left", expand='true', fill='both', anchor='c')
         # ---------------------------Canvas right table
         self.canvas_right_table.config(bg=self.canvas_right_table_color, relief="ridge",
@@ -713,12 +712,10 @@ class Application(tk.Frame):
         dgray = '#242424'
         rgray = '#2e2e2e'
         self.master.overrideredirect(True)
+        self.master.attributes('-topmost', True)
         title_bar = tk.Frame(self.master, bg='#2e2e2e', relief='raised', bd=0, highlightthickness=0, pady=4, padx=4)
 
         def get_pos(event):
-            def move_window(e):
-                self.master.geometry("1400x700" + '+{0}+{1}'.format(e.x_root + xwin, e.y_root + ywin))
-
             xwin = app.winfo_x()
             ywin = app.winfo_y()
             startx = event.x_root
@@ -726,6 +723,9 @@ class Application(tk.Frame):
 
             ywin = ywin - starty
             xwin = xwin - startx
+
+            def move_window(e):
+                self.master.geometry("1500x700" + '+{0}+{1}'.format(e.x_root + xwin, e.y_root + ywin))
 
             startx = event.x_root
             starty = event.y_root
@@ -751,17 +751,19 @@ class Application(tk.Frame):
         def returnm_size_on_hovering(event):
             self.minimize_button['bg'] = rgray
 
-        def minimize_me(e):
+        def hide_screen(e):
             # root.overrideredirect(False)
-            self.master.update_idletasks()
+            self.master.overrideredirect(0)
+            # self.master.update_idletasks()
             # self.master.state('withdrawn')
             self.master.state("iconic")
-            # self.master.state('zoomed')
 
-        def frame_mapped(e):
+        def screen_appear(e):
             print(e)
-            self.master.update_idletasks()
-            self.master.state('normal')
+            self.master.overrideredirect(1)
+            # self.master.update_idletasks()
+            # self.master.state("normal")
+            # self.master.state('zoomed')
 
         # put a close button on the title bar
         self.close_button = tk.Button(title_bar, text='  X  ', command=self.master.destroy, bg=rgray, padx=2, pady=2,
@@ -772,7 +774,7 @@ class Application(tk.Frame):
         self.minimize_button = tk.Button(title_bar, text=' ─ ', bg=rgray, padx=2, pady=2, bd=0, fg='white',
                                          font=("calibri", 10), highlightthickness=0)
         self.title_bar_title = tk.Label(title_bar, text='PassLock', bg=rgray, bd=0, fg='white',
-                                        font=("helvetica", 10), padx=2, pady=2,
+                                        font=("helvetica", 10), padx=21, pady=2,
                                         highlightthickness=0)
 
         # a canvas for the main area of the window
@@ -792,11 +794,12 @@ class Application(tk.Frame):
         self.close_button.bind('<Enter>', changex_on_hovering)
         self.close_button.bind('<Leave>', returnx_to_normalstate)
         self.expand_button.bind('<Enter>', change_size_on_hovering)
-        self.expand_button.bind('<Button-1>', frame_mapped)
+        # self.expand_button.bind('<Button-1>', frame_mapped)
         self.expand_button.bind('<Leave>', return_size_on_hovering)
         self.minimize_button.bind('<Enter>', changem_size_on_hovering)
-        self.minimize_button.bind('<Button-1>', minimize_me)
+        self.minimize_button.bind('<Button-1>', hide_screen)
         self.minimize_button.bind('<Leave>', returnm_size_on_hovering)
+        title_bar.bind('<Map>', screen_appear)
 
     # Backend
     def encrypt(self, password):
