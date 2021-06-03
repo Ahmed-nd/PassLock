@@ -18,6 +18,10 @@ def open_url(self):
     webbrowser.open_new(self)
 
 
+lastClickX = 0
+lastClickY = 0
+
+
 class Application(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
@@ -517,9 +521,6 @@ class Application(tk.Frame):
                 password = password + x
             strong_pass.set(password)
 
-        def slider_changed(_):
-            slider_num_label.config(text=str(int(current_value.get())))
-
             # triggered off left button click on text_field
 
         def copy_text_to_clipboard():
@@ -528,7 +529,9 @@ class Application(tk.Frame):
             self.master.clipboard_append(field_value)  # append new value to clipbaord
 
         # Frame 1 generate_frame
-        generate_frame = tk.Frame(self.tab1)
+        generate_p_frame = tk.Frame(self.tab1, bg=self.canvas_right_table_color)
+        generate_p_frame.pack()
+        generate_frame = tk.Frame(generate_p_frame, bg=self.canvas_right_table_color)
         generate_frame.pack(pady=10)
         strong_pass_entry = tk.Entry(generate_frame, width=50,
                                      font="Arial 12 bold", relief='groove',
@@ -536,24 +539,21 @@ class Application(tk.Frame):
 
         strong_pass_entry.pack(side='left')
         btn_generate = tk.Button(generate_frame, text="Generate", font="Arial 12 bold", border=2,
-                                 relief='groove', bg="lawn green", activebackground='green2', fg=self.font_color,
+                                 relief='groove', bg="lawn green", activebackground='green2',
                                  command=lambda: generate_password(int(current_value.get())))
         btn_generate.pack(side='left')
-        btn_copy = tk.Button(generate_frame, text="Copy", font="Arial 12 bold", border=2, fg=self.font_color,
+        btn_copy = tk.Button(generate_frame, text="Copy", font="Arial 12 bold", border=2,
                              relief='groove', bg="light goldenrod", activebackground='gold',
                              command=copy_text_to_clipboard)
         btn_copy.pack(side='left')
         # Frame 2 pass_len_frame
-        pass_len_frame = tk.Frame(self.tab1)
+        pass_len_frame = tk.Frame(generate_p_frame, bg=self.canvas_right_table_color)
         pass_len_frame.pack()
         # scale Value
         current_value.set(5)
-        scroll_num = ttk.Scale(pass_len_frame, from_=5, to=45, orient='horizontal', length=300,
-                               variable=current_value, command=slider_changed)
+        scroll_num = tk.Scale(pass_len_frame, from_=5, to=45, orient='horizontal', length=310,
+                              variable=current_value, bg=self.canvas_right_table_color)
         scroll_num.pack(side='left')
-        slider_num_label = tk.Label(pass_len_frame, text=str(int(current_value.get())),
-                                    font="Arial 12 bold", relief='groove')
-        slider_num_label.pack(side='left')
 
     # setting
     def setting(self):
@@ -649,19 +649,18 @@ class Application(tk.Frame):
 
         # ---------------------------frame refresh
 
-        self.tab1 = tk.Frame(self.canvas_right_table)
-
-        self.frame_left.config(bg=self.frame_left_color, relief="groove", borderwidth=3, padx=30,
+        self.frame_left.config(bg=self.frame_left_color, relief="groove", borderwidth=2, padx=30,
                                pady=30)
         self.frame_left.pack(side="left", fill='both', anchor='c')
         # ---------------------------frame right
-        self.frame_right.config(bg=self.frame_right_color, relief="groove", borderwidth=0, pady=30)
+        self.frame_right.config(bg=self.frame_right_color, relief="groove", borderwidth=2, pady=30)
         self.frame_right.pack(side="left", expand='true', fill='both', anchor='c')
         # ---------------------------Canvas right table
         self.canvas_right_table.config(bg=self.canvas_right_table_color, relief="ridge",
-                                       borderwidth=4)
+                                       borderwidth=2)
         self.canvas_right_table.pack(side="top", fill='both', anchor='c', padx=30, expand='true')
         # ---------------------------Table
+        self.tab1 = tk.Frame(self.canvas_right_table)
         self.tab1.config(padx=20, pady=20, bg=self.canvas_right_table_color)
         self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
 
@@ -715,26 +714,23 @@ class Application(tk.Frame):
         self.master.attributes('-topmost', True)
         title_bar = tk.Frame(self.master, bg='#2e2e2e', relief='raised', bd=0, highlightthickness=0, pady=4, padx=4)
 
-        def get_pos(event):
-            xwin = app.winfo_x()
-            ywin = app.winfo_y()
-            startx = event.x_root
-            starty = event.y_root
+        def save_last_click_pos(event):
+            global lastClickX, lastClickY
+            lastClickX = event.x
+            lastClickY = event.y
 
-            ywin = ywin - starty
-            xwin = xwin - startx
+        def dragging(event):
+            x, y = event.x - lastClickX + self.master.winfo_x(), event.y - lastClickY + self.master.winfo_y()
+            self.master.geometry("+%s+%s" % (x, y))
 
-            def move_window(e):
-                self.master.geometry("1500x700" + '+{0}+{1}'.format(e.x_root + xwin, e.y_root + ywin + 110))
+        title_bar.bind('<B1-Motion>', dragging)
 
-            title_bar.bind('<B1-Motion>', move_window)
+        title_bar.bind('<Button-1>', save_last_click_pos)
 
-        title_bar.bind('<Button-1>', get_pos)
-
-        def changex_on_hovering(event):
+        def change_x_on_hovering(event):
             self.close_button['bg'] = 'red'
 
-        def returnx_to_normalstate(event):
+        def return_x_to_normalstate(event):
             self.close_button['bg'] = rgray
 
         def change_size_on_hovering(event):
@@ -743,13 +739,13 @@ class Application(tk.Frame):
         def return_size_on_hovering(event):
             self.expand_button['bg'] = rgray
 
-        def changem_size_on_hovering(event):
+        def change_m_size_on_hovering(event):
             self.minimize_button['bg'] = lgray
 
-        def returnm_size_on_hovering(event):
+        def return_m_size_on_hovering(event):
             self.minimize_button['bg'] = rgray
 
-        def minimizeWindow():
+        def minimize_window():
             self.master.withdraw()
             self.master.overrideredirect(False)
             self.master.iconify()
@@ -763,8 +759,10 @@ class Application(tk.Frame):
 
         def restore_down():
             if self.master.state() == 'normal':
+                self.master.overrideredirect(0)
                 self.master.state('zoomed')
             else:
+                self.master.overrideredirect(1)
                 self.master.state('normal')
 
         def hide_screen(e):
@@ -789,7 +787,7 @@ class Application(tk.Frame):
                                        font=("calibri", 10), command=restore_down,
                                        highlightthickness=0)
         self.minimize_button = tk.Button(title_bar, text=' ─ ', bg=rgray, padx=2, pady=2, bd=0, fg='white',
-                                         font=("calibri", 10), highlightthickness=0, command=minimizeWindow)
+                                         font=("calibri", 10), highlightthickness=0, command=minimize_window)
         self.title_bar_title = tk.Label(title_bar, text='PassLock', bg=rgray, bd=0, fg='white',
                                         font=("helvetica", 10), padx=21, pady=2,
                                         highlightthickness=0)
@@ -804,12 +802,12 @@ class Application(tk.Frame):
         self.window.pack(expand=1, fill='both')
 
         # Animation
-        self.close_button.bind('<Enter>', changex_on_hovering)
-        self.close_button.bind('<Leave>', returnx_to_normalstate)
+        self.close_button.bind('<Enter>', change_x_on_hovering)
+        self.close_button.bind('<Leave>', return_x_to_normalstate)
         self.expand_button.bind('<Enter>', change_size_on_hovering)
         self.expand_button.bind('<Leave>', return_size_on_hovering)
-        self.minimize_button.bind('<Enter>', changem_size_on_hovering)
-        self.minimize_button.bind('<Leave>', returnm_size_on_hovering)
+        self.minimize_button.bind('<Enter>', change_m_size_on_hovering)
+        self.minimize_button.bind('<Leave>', return_m_size_on_hovering)
         # check_map
         self.master.bind('<Map>', check_map)  # added bindings to pass windows status to function
         self.master.bind('<Unmap>', check_map)
