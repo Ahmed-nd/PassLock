@@ -651,7 +651,7 @@ class Application(tk.Frame):
 
         self.tab1 = tk.Frame(self.canvas_right_table)
 
-        self.frame_left.config(bg=self.frame_left_color, relief="groove", borderwidth=5, padx=30,
+        self.frame_left.config(bg=self.frame_left_color, relief="groove", borderwidth=3, padx=30,
                                pady=30)
         self.frame_left.pack(side="left", fill='both', anchor='c')
         # ---------------------------frame right
@@ -725,10 +725,8 @@ class Application(tk.Frame):
             xwin = xwin - startx
 
             def move_window(e):
-                self.master.geometry("1500x700" + '+{0}+{1}'.format(e.x_root + xwin, e.y_root + ywin))
+                self.master.geometry("1500x700" + '+{0}+{1}'.format(e.x_root + xwin, e.y_root + ywin + 110))
 
-            startx = event.x_root
-            starty = event.y_root
             title_bar.bind('<B1-Motion>', move_window)
 
         title_bar.bind('<Button-1>', get_pos)
@@ -751,8 +749,27 @@ class Application(tk.Frame):
         def returnm_size_on_hovering(event):
             self.minimize_button['bg'] = rgray
 
+        def minimizeWindow():
+            self.master.withdraw()
+            self.master.overrideredirect(False)
+            self.master.iconify()
+
+        def check_map(event):  # apply override on deiconify.
+            if str(event) == "<Map event>":
+                self.master.overrideredirect(1)
+                print('Deiconified', event)
+            else:
+                print('Iconified', event)
+
+        def restore_down():
+            if self.master.state() == 'normal':
+                self.master.state('zoomed')
+            else:
+                self.master.state('normal')
+
         def hide_screen(e):
             # root.overrideredirect(False)
+            self.master.withdraw()
             self.master.overrideredirect(0)
             # self.master.update_idletasks()
             # self.master.state('withdrawn')
@@ -769,14 +786,13 @@ class Application(tk.Frame):
         self.close_button = tk.Button(title_bar, text='  X  ', command=self.master.destroy, bg=rgray, padx=2, pady=2,
                                       font=("calibri", 10), bd=0, fg='white', highlightthickness=0)
         self.expand_button = tk.Button(title_bar, text=' ■ ', bg=rgray, padx=2, pady=2, bd=0, fg='white',
-                                       font=("calibri", 10),
+                                       font=("calibri", 10), command=restore_down,
                                        highlightthickness=0)
         self.minimize_button = tk.Button(title_bar, text=' ─ ', bg=rgray, padx=2, pady=2, bd=0, fg='white',
-                                         font=("calibri", 10), highlightthickness=0)
+                                         font=("calibri", 10), highlightthickness=0, command=minimizeWindow)
         self.title_bar_title = tk.Label(title_bar, text='PassLock', bg=rgray, bd=0, fg='white',
                                         font=("helvetica", 10), padx=21, pady=2,
                                         highlightthickness=0)
-
         # a canvas for the main area of the window
         self.window.config(bg='black', highlightthickness=0)
         # pack the widgets
@@ -787,19 +803,16 @@ class Application(tk.Frame):
         self.title_bar_title.pack(side='left', padx=20)
         self.window.pack(expand=1, fill='both')
 
-        # xwin=None
-        # ywin=None
-        # bind title bar motion to the move window function
-
+        # Animation
         self.close_button.bind('<Enter>', changex_on_hovering)
         self.close_button.bind('<Leave>', returnx_to_normalstate)
         self.expand_button.bind('<Enter>', change_size_on_hovering)
-        # self.expand_button.bind('<Button-1>', frame_mapped)
         self.expand_button.bind('<Leave>', return_size_on_hovering)
         self.minimize_button.bind('<Enter>', changem_size_on_hovering)
-        self.minimize_button.bind('<Button-1>', hide_screen)
         self.minimize_button.bind('<Leave>', returnm_size_on_hovering)
-        title_bar.bind('<Map>', screen_appear)
+        # check_map
+        self.master.bind('<Map>', check_map)  # added bindings to pass windows status to function
+        self.master.bind('<Unmap>', check_map)
 
     # Backend
     def encrypt(self, password):
