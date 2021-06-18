@@ -12,6 +12,7 @@ class Login(tk.Frame):
         self.master.geometry("500x500")
         self.master.resizable(0, 0)
         # ---------------------------StringVar
+        self.username = tk.StringVar()
         self.password = tk.StringVar()
         # ---------------------------frame1
         self.frame1 = tk.Frame(self.master, bg="pale turquoise", relief="ridge")
@@ -28,35 +29,41 @@ class Login(tk.Frame):
         self.canvas.grid(row=0, column=0, columnspan=2)
         self.canvas.create_image(250, 60, image=self.img)
         # ---------------------------Program UI
+        self.username_label = tk.Label(self.frame1, text="                                    Username:",
+                                           font="Arial 10 bold", bg="pale turquoise")
+        self.username_entry = tk.Entry(self.frame1, width=25, textvariable=self.username)
         self.password_label = tk.Label(self.frame1, text="                                "
                                                          "    Password:", font=("Goudy old style", 10, "bold"),
                                        bg="pale turquoise")
         self.password_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.password)
+        # Grid on the screen
+        self.username_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
+        self.username_entry.grid(row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
+        self.password_label.grid(row=3, column=0, columnspan=2, sticky='w', pady=10)
+        self.password_entry.grid(row=3, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
-        self.password_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
-        self.password_entry.grid(row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
-
+        # Enter btn
         self.btn_reset_pass = tk.Button(self.frame1, text="Forgot your password?", font="Arial 10",
                                         bg='pale turquoise',
-                                        command=self.change_reset, activebackground='#0001e6', activeforeground="white",
+                                        command=self.change_reset, activebackground='pale turquoise', activeforeground="blue2",
                                         border="0")
-        self.btn_reset_pass.grid(row=3, column=0, columnspan=2, pady=7)
+        self.btn_reset_pass.grid(row=4, column=0, columnspan=2, pady=7)
 
         self.btn_enter = tk.Button(self.frame1, text="Enter", font="Arial 10 bold", width=7,
                                    bg="#0001a7", fg='white', command=self.change_app,
                                    activeforeground='white', activebackground='#00dee1')
-        self.btn_enter.grid(row=4, column=0, columnspan=2, pady=14)
+        self.btn_enter.grid(row=5, column=0, columnspan=2, pady=14)
 
         # -------------------------------Events
         self.master.bind('<Return>', self.change_app)
 
-    def change_app(self, *_):
-        password = self.password.get()
+    def change_app(self, *_):   
         file = open('password.txt', 'r')
         file.seek(0, 0)
         content = file.read()
         if content != '':
-            if password == content:
+            username, password = content.split('\n')
+            if password == self.password.get() and username == self.username.get():
                 self.master.destroy()
                 os.system('python application.py')
             elif password == '':

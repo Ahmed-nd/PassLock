@@ -12,6 +12,7 @@ class Signup(tk.Frame):
         self.master.geometry("500x500")
         self.master.resizable(0, 0)
         # ---------------------------StringVar
+        self.username = tk.StringVar()
         self.new_password = tk.StringVar()
         self.confirm = tk.StringVar()
         # ---------------------------frame1
@@ -28,7 +29,9 @@ class Signup(tk.Frame):
         self.canvas.grid(row=0, column=0, columnspan=2)
         self.canvas.create_image(250, 60, image=self.img)
         # ---------------------------Program UI
-        
+        self.username_label = tk.Label(self.frame1, text="                                    Username:",
+                                           font="Arial 10 bold", bg="pale turquoise")
+        self.username_entry = tk.Entry(self.frame1, width=25, textvariable=self.username)
         self.new_password_label = tk.Label(self.frame1, text="                             New password:",
                                            font="Arial 10 bold", bg="pale turquoise")
         self.new_password_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.new_password)
@@ -37,16 +40,21 @@ class Signup(tk.Frame):
                                       font="Arial 10 bold", bg="pale turquoise")
         self.confirm_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.confirm)
 
-        self.new_password_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
-        self.new_password_entry.grid(row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
+        # Grid on the screen
+        self.username_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
+        self.username_entry.grid(row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
-        self.confirm_label.grid(row=3, column=0, columnspan=2, sticky='w', pady=10)
-        self.confirm_entry.grid(row=3, column=1, columnspan=2, sticky='e', pady=10, padx=130)
+        self.new_password_label.grid(row=3, column=0, columnspan=2, sticky='w', pady=10)
+        self.new_password_entry.grid(row=3, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
+        self.confirm_label.grid(row=4, column=0, columnspan=2, sticky='w', pady=10)
+        self.confirm_entry.grid(row=4, column=1, columnspan=2, sticky='e', pady=10, padx=130)
+
+        # Enter btn
         self.btn_enter = tk.Button(self.frame1, text="Enter", font="Arial 10 bold", width=7,
                                    bg="#0001a7", fg='white', command=self.change,
                                    activeforeground='white', activebackground='#00dee1')
-        self.btn_enter.grid(row=4, column=0, columnspan=2, pady=20)
+        self.btn_enter.grid(row=5, column=0, columnspan=2, pady=20)
         # -------------------------------Events
         self.master.bind('<Return>', self.change)
 
@@ -59,6 +67,7 @@ class Signup(tk.Frame):
             # store the new password in Database
             file = open('password.txt', 'w')
             file.seek(0, 0)
+            file.write(self.username.get() + '\n')
             file.write(new_password)
             self.master.destroy()
             os.system('python login.py')
