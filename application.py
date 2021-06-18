@@ -200,11 +200,11 @@ class Application(tk.Frame):
             self.tab1.destroy()
             self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg=self.canvas_right_table_color)
             self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-            self.folder_lst = [('www.Google.com', 'go354', '123', 'Visit', 'Edit', 'Del'),
-                               ('www.Google.com', 'go121', '321', 'Visit', 'Edit', 'Del'),
-                               ('www.Facebook.com', 'face12354', '231', 'Visit', 'Edit', 'Del'),
-                               ('www.youtube.com', 'yo4453', '132', 'Visit', 'Edit', 'Del'),
-                               ('www.Coursera.com', 'Cour1234', '312', 'Visit', 'Edit', 'Del')]
+            self.folder_lst = [('Google','www.Google.com', 'go354', '123', 'Visit', 'Edit', 'Del'),
+                               ('Google','www.Google.com', 'go121', '321', 'Visit', 'Edit', 'Del'),
+                               ('Google','www.Facebook.com', 'face12354', '231', 'Visit', 'Edit', 'Del'),
+                               ('Google','www.youtube.com', 'yo4453', '132', 'Visit', 'Edit', 'Del'),
+                               ('Google','www.Coursera.com', 'Cour1234', '312', 'Visit', 'Edit', 'Del')]
             self.show_account(self.lst[row][0])
 
     def add_new_folder(self):
@@ -270,13 +270,13 @@ class Application(tk.Frame):
         search.SearchBox(self.tab1, command=command, placeholder="Type and press enter",
                          entry_highlightthickness=0, button_foreground=self.font_color
                          , entry_width=40).grid(row=0, column=5, columnspan=3)
-        lst_menu = ['Website', 'Username', 'Password', 'tools']
-        lst_menu_wid = [20, 30, 25, 33]
+        lst_menu = ['Website','URL', 'Username', 'Password', 'tools']
+        lst_menu_wid = [15, 20,20, 20, 33]
         for i in range(2, len(lst_menu) + 2):
             e = tk.Label(self.tab1, text=lst_menu[i - 2], width=lst_menu_wid[i - 2],
                          font="Arial 12 bold", relief='groove', fg=self.font_color, bg=self.frame_left_color)
             e.grid(row=1, column=i, pady=2)
-            if i == 5:
+            if i == 6:
                 e.grid(columnspan=3)
         del self.lst_tk
         self.lst_tk = []
@@ -289,7 +289,7 @@ class Application(tk.Frame):
             e.grid(row=i, column=1, padx=2, pady=2)
             temp_tk.append(e)
             for j in range(2, total_columns + 2):
-                if j < 5:
+                if j < 6:
                     e = tk.Label(self.tab1, text=self.folder_lst[i - 2][j - 2], width=self.folder_lst_wid[j - 2],
                                  bg=self.folder_bg_color[j - 2], font="Arial 12 bold", relief='groove', )
                 else:
@@ -658,11 +658,11 @@ class Application(tk.Frame):
         self.bg_color = ['light cyan', 'gold', 'royal blue', 'firebrick1']
         # database 2
         self.folder_lst = []
-        self.folder_lst_wid = [20, 30, 25, 10, 10, 10]
+        self.folder_lst_wid = [15, 20, 20, 20, 10, 10, 10]
         self.account_web = tk.StringVar()
         self.account_username = tk.StringVar()
         self.account_password = tk.StringVar()
-        self.folder_bg_color = ['light cyan', 'light cyan', 'light cyan', 'gold', 'royal blue', 'firebrick1']
+        self.folder_bg_color = ['light cyan', 'light cyan', 'light cyan', 'light cyan', 'gold', 'royal blue', 'firebrick1']
         # add btn
         self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
                                  relief='groove', bg="lawn green", activebackground='green2',
