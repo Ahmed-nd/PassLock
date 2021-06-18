@@ -1,6 +1,8 @@
 import os
 import tkinter as tk
 from tkinter import messagebox
+import DB
+
 
 
 class Signup(tk.Frame):
@@ -65,6 +67,7 @@ class Signup(tk.Frame):
             messagebox.showerror("PassLock", "Enter your password")
         elif new_password == confirm and len(new_password) >= 8:
             # store the new password in Database
+            # DB.InsertIntoAccount(self.username, )
             file = open('password.txt', 'w')
             file.seek(0, 0)
             file.write(self.username.get() + '\n')

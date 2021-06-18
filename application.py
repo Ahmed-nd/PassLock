@@ -9,7 +9,7 @@ import hashlib
 from Cryptodome.Cipher import AES
 from Cryptodome.Random import get_random_bytes
 import search
-
+import DB
 
 # pip install pycryptodomex
 # pip install pycryptodome
@@ -26,8 +26,6 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.master = master
-
-       
         # self.master.state('zoomed')
         # -------------------------------
         self.close_button = tk.Button()
@@ -37,17 +35,6 @@ class Application(tk.Frame):
         self.window = tk.Canvas(self.master)
 
         self.menu_bar()
-        # colors
-        """
-        # 1
-        
-        # 2
-        "#00dee1"
-        "pale turquoise"
-        "floral white"
-        'white'
-        
-        """
         self.frame_left_color = "gray12"
         self.frame_right_color = "gray12"
         self.canvas_right_table_color = "gray70"
@@ -76,30 +63,238 @@ class Application(tk.Frame):
         # database 2
         self.folder_lst = []
         self.folder_lst_wid = []
-        self.account_web = tk.StringVar()
-        self.account_username = tk.StringVar()
-        self.account_password = tk.StringVar()
         self.folder_bg_color = []
         # ---------------------------Table
         self.tab1 = tk.Frame(self.canvas_right_table)
         self.btn_add = tk.Button(self.tab1)
         self.show_app()
 
-    # GUI folder table
+    # GUI All the Application
+    # ------------------------------------------------------------------------
+    def menu_bar(self):
+        """
+        Create Titlebar
+        """
+        lgray = '#545454'
+        dgray = '#242424'
+        rgray = '#2e2e2e'
+        self.master.geometry("1500x700+20+60")
+        self.master.overrideredirect(True)
+        title_bar = tk.Frame(self.master, bg='#2e2e2e', relief='raised', bd=0, highlightthickness=0, pady=4, padx=4)
+
+        def save_last_click_pos(event):
+            global lastClickX, lastClickY
+            lastClickX = event.x
+            lastClickY = event.y
+
+        def dragging(event):
+            x, y = event.x - lastClickX + self.master.winfo_x(), event.y - lastClickY + self.master.winfo_y()
+            self.master.geometry("+%s+%s" % (x, y))
+
+        title_bar.bind('<B1-Motion>', dragging)
+
+        title_bar.bind('<Button-1>', save_last_click_pos)
+
+        def change_x_on_hovering(event):
+            self.close_button['bg'] = 'red'
+
+        def return_x_to_normalstate(event):
+            self.close_button['bg'] = rgray
+
+        def change_size_on_hovering(event):
+            self.expand_button['bg'] = lgray
+
+        def return_size_on_hovering(event):
+            self.expand_button['bg'] = rgray
+
+        def change_m_size_on_hovering(event):
+            self.minimize_button['bg'] = lgray
+
+        def return_m_size_on_hovering(event):
+            self.minimize_button['bg'] = rgray
+
+        def minimize_window():
+            self.master.withdraw()
+            self.master.overrideredirect(False)
+            self.master.iconify()
+
+        def check_map(event):  # apply override on deiconify.
+            if str(event) == "<Map event>":
+                self.master.overrideredirect(1)
+
+        def restore_down():
+            if self.master.state() == 'normal':
+                self.master.state('zoomed')
+            else:
+                self.master.state('normal')
+                self.master.geometry("1500x700+20+60")
+
+        # put a close button on the title bar
+        self.close_button = tk.Button(title_bar, text='  X  ', command=self.master.destroy, bg=rgray, padx=2, pady=2,
+                                      font=("calibri", 10), bd=0, fg='white', highlightthickness=0)
+        self.expand_button = tk.Button(title_bar, text=' ■ ', bg=rgray, padx=2, pady=2, bd=0, fg='white',
+                                       font=("calibri", 10), command=restore_down,
+                                       highlightthickness=0)
+        self.minimize_button = tk.Button(title_bar, text=' ─ ', bg=rgray, padx=2, pady=2, bd=0, fg='white',
+                                         font=("calibri", 10), highlightthickness=0, command=minimize_window)
+        self.title_bar_title = tk.Label(title_bar, text='PassLock', bg=rgray, bd=0, fg='white',
+                                        font=("helvetica", 10), padx=21, pady=2,
+                                        highlightthickness=0)
+        # a canvas for the main area of the window
+        self.window.config(bg='black', highlightthickness=0)
+        # pack the widgets
+        title_bar.pack(fill='x')
+        self.close_button.pack(side='right')
+        self.expand_button.pack(side='right')
+        self.minimize_button.pack(side='right')
+        self.title_bar_title.pack(side='left', padx=20)
+        self.window.pack(expand=1, fill='both')
+
+        # Animation
+        self.close_button.bind('<Enter>', change_x_on_hovering)
+        self.close_button.bind('<Leave>', return_x_to_normalstate)
+        self.expand_button.bind('<Enter>', change_size_on_hovering)
+        self.expand_button.bind('<Leave>', return_size_on_hovering)
+        self.minimize_button.bind('<Enter>', change_m_size_on_hovering)
+        self.minimize_button.bind('<Leave>', return_m_size_on_hovering)
+        # check_map
+        self.master.bind('<Map>', check_map)  # added bindings to pass windows status to function
+        self.master.bind('<Unmap>', check_map)
+  
+    def show_app(self):
+        """
+        Start the Application
+        """
+        about_url = "https://github.com/Ahmed-nd/PassLock#developers"
+
+        self.frame_left.config(bg=self.frame_left_color, relief="groove", borderwidth=2, padx=30,
+                               pady=30)
+        self.frame_left.pack(side="left", fill='both', anchor='c')
+        # ---------------------------frame right
+        self.frame_right.config(bg=self.frame_right_color, relief="groove", borderwidth=2, pady=30)
+        self.frame_right.pack(side="left", expand='true', fill='both', anchor='c')
+        # ---------------------------Canvas right table
+        self.canvas_right_table.config(bg=self.canvas_right_table_color, relief="ridge",
+                                       borderwidth=2)
+        self.canvas_right_table.pack(side="top", fill='both', anchor='c', padx=30, expand='true')
+        # ---------------------------Table
+        self.tab1 = tk.Frame(self.canvas_right_table)
+        self.tab1.config(padx=20, pady=20, bg=self.canvas_right_table_color)
+        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
+
+        # ------------------------------left
+        btn_enter = tk.Button(self.frame_left, text="All Folders", font="Arial 10 bold", border=0,
+                              bg=self.frame_left_color, activebackground=self.frame_left_color,
+                              command=self.refresh_folder_table, fg=self.font_color)
+        btn_enter.pack(pady=10)
+        btn_enter = tk.Button(self.frame_left, text="Auto Fill", font="Arial 10 bold", border=0, command=self.auto_fill,
+                              bg=self.frame_left_color, activebackground=self.frame_left_color, fg=self.font_color)
+        btn_enter.pack(pady=10)
+        btn_enter = tk.Button(self.frame_left, text="Generate\nPassword", font="Arial 10 bold", border=0,
+                              bg=self.frame_left_color, activebackground=self.frame_left_color,
+                              command=self.generate_pass, fg=self.font_color)
+        btn_enter.pack(pady=10)
+        btn_enter = tk.Button(self.frame_left, text="Setting", font="Arial 10 bold", border=0, command=self.setting,
+                              bg=self.frame_left_color, activebackground=self.frame_left_color, fg=self.font_color)
+        btn_enter.pack(pady=10)
+        btn_enter = tk.Button(self.frame_left, text="About", command=lambda link=about_url: open_url(link)
+                              , font="Arial 10 bold", border=0, fg=self.font_color,
+                              bg=self.frame_left_color, activebackground=self.frame_left_color)
+        btn_enter.pack(pady=10)
+        # database 1 
+        # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        self.lst = [('Raj', 'View', 'Edit', 'Del'),
+                        ('Aaryan', 'View', 'Edit', 'Del'),
+                        ('Vaishnavi', 'View', 'Edit', 'Del'),
+                        ('Rachna', 'View', 'Edit', 'Del'),
+                        ('Shubham', 'View', 'Edit', 'Del')]
+        # if db_Fetch_folder_table:
+        #     for i in range(len(db_Fetch_folder_table)):
+        #         t = list(self.lst[row])
+        #         t[i] = name
+        #         self.lst[row] = tuple(t)
+                
+        self.lst_tk = []
+        self.wid = [30, 10, 10, 10]
+        self.folder_name = tk.StringVar()
+        self.bg_color = ['light cyan', 'gold', 'royal blue', 'firebrick1']
+        # database 2
+        self.folder_lst = []
+        self.folder_lst_wid = [15, 20, 15, 15,10, 20, 10]
+        self.account_web = tk.StringVar()
+        self.account_username = tk.StringVar()
+        self.account_password = tk.StringVar()
+        self.folder_bg_color = ['light cyan', 'light cyan', 'light cyan', 'light cyan' , 'gold', 'royal blue', 'firebrick1']
+        # add btn
+        self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
+                                 relief='groove', bg="lawn green", activebackground='green2',
+                                 command=self.add_new_folder, fg=self.font_color)
+        self.show_table()
+    # GUI Folder table
+    # ------------------------------------------------------------------------
     def show_table(self):
         """
         show all the Folders in database
         """
 
-        def command(find):
-            print('search:' + find)
+        def Find(search):
+            print('search:' + search)
+            names_folderlst = [element[0].lower() for element in self.lst]
+            if search.lower() in names_folderlst:
+                top = tk.Toplevel()
+                top.title("PassLock")
+                top.iconbitmap("images\icon.ico")
+                top.resizable(0, 0)
+                top.geometry("+100+150")
+                top_frame = tk.Frame(top, padx=20, pady=20, bg=self.canvas_right_table_color)
+                top_frame.pack()
+                found_ind = names_folderlst.index(search.lower())
+                print(found_ind)
+
+                def add():
+                    print("add")
+                    folder_name = self.folder_name.get()
+                    if folder_name != '':
+                        t = list(self.lst[found_ind])
+                        t[0] = folder_name
+                        # store Note in the database
+                        # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                        top.destroy()
+                        self.lst[found_ind] = tuple(t)
+                        self.refresh_folder_table()
+                        
+                    else:
+                        messagebox.showerror("PassLock", "Please Enter the data")
+
+                # Data Frame Entry
+                entry_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                entry_frame.pack()
+                folder_name_entry = tk.Entry(entry_frame, width=30,
+                                            font="Arial 12 bold", relief='raised',
+                                            textvariable=self.folder_name)
+                self.folder_name.set(self.lst[found_ind][0])
+                folder_name_entry.grid(row=0, column=0, padx=20, pady=2)
+                #  btn add/cancel
+                btn_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                btn_frame.pack()
+                self.btn_add = tk.Button(btn_frame, text="Cancel", font="Arial 12 bold", border=2, width=15,
+                                        relief='groove', bg="red", activebackground='red2',
+                                        command=top.destroy, )
+
+                self.btn_add.grid(row=1, column=0, pady=2)
+                self.btn_add = tk.Button(btn_frame, text="Edit", font="Arial 12 bold", border=2, width=15,
+                                        relief='groove', bg="lawn green", activebackground='green2',
+                                        command=add, )
+                self.btn_add.grid(row=2, column=0, pady=2)
+            else:
+                messagebox.showerror("PassLock", "Folder name not found")
 
         # floral white
         filename = tk.Label(self.tab1, text="Folders:", width=10, bg=self.canvas_right_table_color,
                             font="Times 26 bold", )
         filename.grid(row=0, column=0, pady=25)
         # Search box
-        search.SearchBox(self.tab1, command=command, placeholder="Type and press enter",
+        search.SearchBox(self.tab1, command=Find, placeholder="Type and press enter",
                          button_foreground=self.font_color,
                          entry_highlightthickness=0, entry_width=40).grid(row=0, column=3, columnspan=3)
         # menu
@@ -200,11 +395,11 @@ class Application(tk.Frame):
             self.tab1.destroy()
             self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg=self.canvas_right_table_color)
             self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-            self.folder_lst = [('Google','www.Google.com', 'go354', '123', 'Visit', 'Edit', 'Del'),
-                               ('Google','www.Google.com', 'go121', '321', 'Visit', 'Edit', 'Del'),
-                               ('Google','www.Facebook.com', 'face12354', '231', 'Visit', 'Edit', 'Del'),
-                               ('Google','www.youtube.com', 'yo4453', '132', 'Visit', 'Edit', 'Del'),
-                               ('Google','www.Coursera.com', 'Cour1234', '312', 'Visit', 'Edit', 'Del')]
+            self.folder_lst = [('Google','www.Google.com', 'go354', '123', 'Visit', 'View & Edit', 'Del'),
+                               ('Google','www.Google.com', 'go121', '321', 'Visit', 'View & Edit', 'Del'),
+                               ('Google','www.Facebook.com', 'face12354', '231', 'Visit', 'View & Edit', 'Del'),
+                               ('Google','www.youtube.com', 'yo4453', '132', 'Visit', 'View & Edit', 'Del'),
+                               ('Google','www.Coursera.com', 'Cour1234', '312', 'Visit', 'View & Edit', 'Del')]
             self.show_account(self.lst[row][0])
 
     def add_new_folder(self):
@@ -260,24 +455,109 @@ class Application(tk.Frame):
                 show all the accounts in database folder
                 """
 
-        def command(find):
-            print('search :' + find)
+        def Find(search):
+            print('search:' + search)
+            websites = [element[0].lower() for element in self.folder_lst]
+            if search.lower() in websites:
+                found_ind = websites.index(search.lower())
+                top = tk.Toplevel()
+                top.title("PassLock")
+                top.iconbitmap("images\icon.ico")
+                top.resizable(0, 0)
+                top.geometry("+100+150")
+                top_frame = tk.Frame(top, padx=20, pady=20, bg=self.canvas_right_table_color)
+                top_frame.pack()
+                self.account_web = tk.StringVar()
+                self.account_url = tk.StringVar()
+                self.account_username = tk.StringVar()
+                self.account_password = tk.StringVar()
+                def add():
+                    print("add")
+                    web = self.account_web.get()
+                    url = self.account_url.get()
+                    username = self.account_username.get()
+                    password = self.account_password.get()
+                    Note = folder_name_entry.get('1.0', tk.END)
+                    print(Note)
+                    if web != '' and username != '' and password != '' and url != '' and Note != '':
+                        t = list(self.folder_lst[found_ind])
+                        t[0] = web
+                        t[1] = url
+                        t[2] = username
+                        t[3] = password
+                        # store Note in the database
+                        # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                        top.destroy()
+                        self.folder_lst[found_ind] = tuple(t)
+                        self.tab1.destroy()
+                        self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg=self.canvas_right_table_color)
+                        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
+                        self.show_account(account_fold_name)
+                    else:
+                        messagebox.showerror("PassLock", "Please Enter the data")
+
+                # Data Frame Entry
+                entry_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                entry_frame.pack()
+                folder_name_entry = tk.Entry(entry_frame, width=30,
+                                            font="Arial 12 bold", relief='raised',
+                                            textvariable=self.account_web)
+                self.account_web.set(self.folder_lst[found_ind][0])
+                folder_name_entry.grid(row=0, column=0, padx=20, pady=2)
+
+                folder_name_entry = tk.Entry(entry_frame, width=30,
+                                            font="Arial 12 bold", relief='raised',
+                                            textvariable=self.account_url)
+                self.account_url.set(self.folder_lst[found_ind][1])
+                folder_name_entry.grid(row=1, column=0, padx=20, pady=2)
+
+                folder_name_entry = tk.Entry(entry_frame, width=30,
+                                            font="Arial 12 bold", relief='raised',
+                                            textvariable=self.account_username)
+                self.account_username.set(self.folder_lst[found_ind][2])
+                folder_name_entry.grid(row=2, column=0, padx=20, pady=2)
+
+                folder_name_entry = tk.Entry(entry_frame, width=30,
+                                            font="Arial 12 bold", relief='raised',
+                                            textvariable=self.account_password)
+                self.account_password.set(self.folder_lst[found_ind][3])
+                folder_name_entry.grid(row=3, column=0, padx=20, pady=2)
+
+                folder_name_entry = tk.Text(entry_frame, width=30,height=10,
+                                            font="Arial 12 bold", relief='raised')
+                folder_name_entry.insert('1.0',self.folder_lst[found_ind][4])
+                folder_name_entry.grid(row=4, column=0, padx=20, pady=5)
+                #  btn add/cancel
+                btn_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                btn_frame.pack()
+                self.btn_add = tk.Button(btn_frame, text="Cancel", font="Arial 12 bold", border=2, width=15,
+                                        relief='groove', bg="red", activebackground='red2',
+                                        command=top.destroy, )
+
+                self.btn_add.grid(row=5, column=0, pady=2)
+                self.btn_add = tk.Button(btn_frame, text="Add", font="Arial 12 bold", border=2, width=15,
+                                        relief='groove', bg="lawn green", activebackground='green2',
+                                        command=add, )
+                self.btn_add.grid(row=6, column=0, pady=2)
+            else:
+                messagebox.showerror("PassLock", "Folder name not found")
+
 
         # floral white
         filename = tk.Label(self.tab1, text=account_fold_name + ":", width=40, bg=self.canvas_right_table_color,
                             font="Times 26 bold", anchor='w')
         filename.grid(row=0, column=0, pady=25, columnspan=10, sticky='w')
-        search.SearchBox(self.tab1, command=command, placeholder="Type and press enter",
+        search.SearchBox(self.tab1, command=Find, placeholder="Type and press enter",
                          entry_highlightthickness=0, button_foreground=self.font_color
-                         , entry_width=40).grid(row=0, column=5, columnspan=3)
+                         , entry_width=40).grid(row=0, column=6, columnspan=3)
         lst_menu = ['Website','URL', 'Username', 'Password', 'tools']
-        lst_menu_wid = [15, 20,20, 20, 33]
+        lst_menu_wid = [15, 20,15, 15, 44]
         for i in range(2, len(lst_menu) + 2):
             e = tk.Label(self.tab1, text=lst_menu[i - 2], width=lst_menu_wid[i - 2],
                          font="Arial 12 bold", relief='groove', fg=self.font_color, bg=self.frame_left_color)
             e.grid(row=1, column=i, pady=2)
             if i == 6:
-                e.grid(columnspan=3)
+                e.grid(columnspan=4)
         del self.lst_tk
         self.lst_tk = []
         total_rows = len(self.folder_lst)
@@ -316,37 +596,53 @@ class Application(tk.Frame):
 
     def accounts_table_tools(self, account_fold_name, row, column):
         """
-                        View folder content and Edit folder name and Delete Folder from database
-                        this function take the button that have been clicked (row, column) and
-                        from that it know witch folder and witch code that need to run.
+            View folder content and Edit folder name and Delete Folder from database
+            this function take the button that have been clicked (row, column) and
+            from that it know witch folder and witch code that need to run.
                 """
         print(row, column)
-        if column == 5:
+        if column == 6:
             # delete record
             del self.folder_lst[row]
             self.tab1.destroy()
             self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg=self.canvas_right_table_color)
             self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
             self.show_account(account_fold_name)
-        elif column == 4:
+        elif column == 5:
             # Edit record
-            del self.account_web
-            del self.account_username
-            del self.account_password
+            # Create Top level
+            # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+            top = tk.Toplevel()
+            top.title("PassLock")
+            top.iconbitmap("images\icon.ico")
+            top.resizable(0, 0)
+            top.geometry("+100+150")
+
+            top_frame = tk.Frame(top, padx=20, pady=20, bg=self.canvas_right_table_color)
+            top_frame.pack()
             self.account_web = tk.StringVar()
+            self.account_url = tk.StringVar()
             self.account_username = tk.StringVar()
             self.account_password = tk.StringVar()
+
 
             def add():
                 print("add")
                 web = self.account_web.get()
+                url = self.account_url.get()
                 username = self.account_username.get()
                 password = self.account_password.get()
-                if web != '' and username != '' and password != '':
+                Note = folder_name_entry.get('1.0', tk.END)
+                print(Note)
+                if web != '' and username != '' and password != '' and url != '' and Note != '':
                     t = list(self.folder_lst[row])
                     t[0] = web
-                    t[1] = username
-                    t[2] = password
+                    t[1] = url
+                    t[2] = username
+                    t[3] = password
+                    # store Note in the database
+                    # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+                    top.destroy()
                     self.folder_lst[row] = tuple(t)
                     self.tab1.destroy()
                     self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg=self.canvas_right_table_color)
@@ -355,33 +651,53 @@ class Application(tk.Frame):
                 else:
                     messagebox.showerror("PassLock", "Please Enter the data")
 
-            total_columns = len(self.folder_lst[0])
-            self.btn_add.destroy()
-            self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
-                                     relief='groove', bg="lawn green", activebackground='green2',
-                                     command=add, )
-            self.btn_add.grid(row=row + 2, column=total_columns + 3)
-
-            folder_name_entry = tk.Entry(self.tab1, width=self.folder_lst_wid[0] + 3,
-                                         font="Arial 12 bold", relief='groove',
+            # Data Frame Entry
+            entry_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+            entry_frame.pack()
+            folder_name_entry = tk.Entry(entry_frame, width=30,
+                                         font="Arial 12 bold", relief='raised',
                                          textvariable=self.account_web)
             self.account_web.set(self.folder_lst[row][0])
-            folder_name_entry.grid(row=row + 2, column=2, padx=2, pady=2)
+            folder_name_entry.grid(row=0, column=0, padx=20, pady=2)
 
-            folder_name_entry = tk.Entry(self.tab1, width=self.folder_lst_wid[1] + 4,
-                                         font="Arial 12 bold", relief='groove',
+            folder_name_entry = tk.Entry(entry_frame, width=30,
+                                         font="Arial 12 bold", relief='raised',
+                                         textvariable=self.account_url)
+            self.account_url.set(self.folder_lst[row][1])
+            folder_name_entry.grid(row=1, column=0, padx=20, pady=2)
+
+            folder_name_entry = tk.Entry(entry_frame, width=30,
+                                         font="Arial 12 bold", relief='raised',
                                          textvariable=self.account_username)
-            self.account_username.set(self.folder_lst[row][1])
-            folder_name_entry.grid(row=row + 2, column=3, padx=2, pady=2)
+            self.account_username.set(self.folder_lst[row][2])
+            folder_name_entry.grid(row=2, column=0, padx=20, pady=2)
 
-            folder_name_entry = tk.Entry(self.tab1, width=self.folder_lst_wid[2] + 3,
-                                         font="Arial 12 bold", relief='groove',
+            folder_name_entry = tk.Entry(entry_frame, width=30,
+                                         font="Arial 12 bold", relief='raised',
                                          textvariable=self.account_password)
-            self.account_password.set(self.folder_lst[row][2])
-            folder_name_entry.grid(row=row + 2, column=4, padx=2, pady=2)
-        elif column == 3:
+            self.account_password.set(self.folder_lst[row][3])
+            folder_name_entry.grid(row=3, column=0, padx=20, pady=2)
+
+            folder_name_entry = tk.Text(entry_frame, width=30,height=10,
+                                         font="Arial 12 bold", relief='raised')
+            folder_name_entry.insert('1.0',self.folder_lst[row][4])
+            folder_name_entry.grid(row=4, column=0, padx=20, pady=5)
+            #  btn add/cancel
+            btn_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+            btn_frame.pack()
+            self.btn_add = tk.Button(btn_frame, text="Cancel", font="Arial 12 bold", border=2, width=15,
+                                     relief='groove', bg="red", activebackground='red2',
+                                     command=top.destroy, )
+
+            self.btn_add.grid(row=5, column=0, pady=2)
+            self.btn_add = tk.Button(btn_frame, text="Add", font="Arial 12 bold", border=2, width=15,
+                                     relief='groove', bg="lawn green", activebackground='green2',
+                                     command=add, )
+            self.btn_add.grid(row=6, column=0, pady=2)
+
+        elif column == 4:
             # visit record link
-            open_url(self.folder_lst[row][0])
+            open_url(self.folder_lst[row][1])
 
     def add_new_account(self, account_fold_name):
         print("Add folder")
@@ -553,7 +869,7 @@ class Application(tk.Frame):
                               variable=current_value, bg=self.canvas_right_table_color)
         scroll_num.pack(side='left')
 
-    # setting
+    # GUI setting
     def setting(self):
 
         self.tab1.destroy()
@@ -608,157 +924,6 @@ class Application(tk.Frame):
         dark_mode_frame = tk.Frame(self.tab1, bg=self.canvas_right_table_color)
         dark_mode_frame.grid(row=1, column=1)
 
-    def show_app(self):
-
-        about_url = "https://github.com/Ahmed-nd/PassLock#developers"
-
-        self.frame_left.config(bg=self.frame_left_color, relief="groove", borderwidth=2, padx=30,
-                               pady=30)
-        self.frame_left.pack(side="left", fill='both', anchor='c')
-        # ---------------------------frame right
-        self.frame_right.config(bg=self.frame_right_color, relief="groove", borderwidth=2, pady=30)
-        self.frame_right.pack(side="left", expand='true', fill='both', anchor='c')
-        # ---------------------------Canvas right table
-        self.canvas_right_table.config(bg=self.canvas_right_table_color, relief="ridge",
-                                       borderwidth=2)
-        self.canvas_right_table.pack(side="top", fill='both', anchor='c', padx=30, expand='true')
-        # ---------------------------Table
-        self.tab1 = tk.Frame(self.canvas_right_table)
-        self.tab1.config(padx=20, pady=20, bg=self.canvas_right_table_color)
-        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-
-        # ------------------------------left
-        btn_enter = tk.Button(self.frame_left, text="All Folders", font="Arial 10 bold", border=0,
-                              bg=self.frame_left_color, activebackground=self.frame_left_color,
-                              command=self.refresh_folder_table, fg=self.font_color)
-        btn_enter.pack(pady=10)
-        btn_enter = tk.Button(self.frame_left, text="Auto Fill", font="Arial 10 bold", border=0, command=self.auto_fill,
-                              bg=self.frame_left_color, activebackground=self.frame_left_color, fg=self.font_color)
-        btn_enter.pack(pady=10)
-        btn_enter = tk.Button(self.frame_left, text="Generate\nPassword", font="Arial 10 bold", border=0,
-                              bg=self.frame_left_color, activebackground=self.frame_left_color,
-                              command=self.generate_pass, fg=self.font_color)
-        btn_enter.pack(pady=10)
-        btn_enter = tk.Button(self.frame_left, text="Setting", font="Arial 10 bold", border=0, command=self.setting,
-                              bg=self.frame_left_color, activebackground=self.frame_left_color, fg=self.font_color)
-        btn_enter.pack(pady=10)
-        btn_enter = tk.Button(self.frame_left, text="About", command=lambda link=about_url: open_url(link)
-                              , font="Arial 10 bold", border=0, fg=self.font_color,
-                              bg=self.frame_left_color, activebackground=self.frame_left_color)
-        btn_enter.pack(pady=10)
-        # database 1
-        self.lst = [('Raj', 'View', 'Edit', 'Del'),
-                    ('Aaryan', 'View', 'Edit', 'Del'),
-                    ('Vaishnavi', 'View', 'Edit', 'Del'),
-                    ('Rachna', 'View', 'Edit', 'Del'),
-                    ('Shubham', 'View', 'Edit', 'Del')]
-        self.lst_tk = []
-        self.wid = [30, 10, 10, 10]
-        self.folder_name = tk.StringVar()
-        self.bg_color = ['light cyan', 'gold', 'royal blue', 'firebrick1']
-        # database 2
-        self.folder_lst = []
-        self.folder_lst_wid = [15, 20, 20, 20, 10, 10, 10]
-        self.account_web = tk.StringVar()
-        self.account_username = tk.StringVar()
-        self.account_password = tk.StringVar()
-        self.folder_bg_color = ['light cyan', 'light cyan', 'light cyan', 'light cyan', 'gold', 'royal blue', 'firebrick1']
-        # add btn
-        self.btn_add = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
-                                 relief='groove', bg="lawn green", activebackground='green2',
-                                 command=self.add_new_folder, fg=self.font_color)
-        self.show_table()
-
-    def menu_bar(self):
-        lgray = '#545454'
-        dgray = '#242424'
-        rgray = '#2e2e2e'
-        self.master.geometry("1500x700+20+60")
-        self.master.overrideredirect(True)
-        self.master.attributes('-topmost', True)
-        title_bar = tk.Frame(self.master, bg='#2e2e2e', relief='raised', bd=0, highlightthickness=0, pady=4, padx=4)
-
-        def save_last_click_pos(event):
-            global lastClickX, lastClickY
-            lastClickX = event.x
-            lastClickY = event.y
-
-        def dragging(event):
-            x, y = event.x - lastClickX + self.master.winfo_x(), event.y - lastClickY + self.master.winfo_y()
-            self.master.geometry("+%s+%s" % (x, y))
-
-        title_bar.bind('<B1-Motion>', dragging)
-
-        title_bar.bind('<Button-1>', save_last_click_pos)
-
-        def change_x_on_hovering(event):
-            self.close_button['bg'] = 'red'
-
-        def return_x_to_normalstate(event):
-            self.close_button['bg'] = rgray
-
-        def change_size_on_hovering(event):
-            self.expand_button['bg'] = lgray
-
-        def return_size_on_hovering(event):
-            self.expand_button['bg'] = rgray
-
-        def change_m_size_on_hovering(event):
-            self.minimize_button['bg'] = lgray
-
-        def return_m_size_on_hovering(event):
-            self.minimize_button['bg'] = rgray
-
-        def minimize_window():
-            self.master.withdraw()
-            self.master.overrideredirect(False)
-            self.master.iconify()
-
-        def check_map(event):  # apply override on deiconify.
-            if str(event) == "<Map event>":
-                self.master.overrideredirect(1)
-
-        def restore_down():
-            if self.master.state() == 'normal':
-                self.master.overrideredirect(0)
-                self.master.state('zoomed')
-            else:
-                self.master.overrideredirect(1)
-                self.master.state('normal')
-                self.master.geometry("1500x700+20+60")
-
-        # put a close button on the title bar
-        self.close_button = tk.Button(title_bar, text='  X  ', command=self.master.destroy, bg=rgray, padx=2, pady=2,
-                                      font=("calibri", 10), bd=0, fg='white', highlightthickness=0)
-        self.expand_button = tk.Button(title_bar, text=' ■ ', bg=rgray, padx=2, pady=2, bd=0, fg='white',
-                                       font=("calibri", 10), command=restore_down,
-                                       highlightthickness=0)
-        self.minimize_button = tk.Button(title_bar, text=' ─ ', bg=rgray, padx=2, pady=2, bd=0, fg='white',
-                                         font=("calibri", 10), highlightthickness=0, command=minimize_window)
-        self.title_bar_title = tk.Label(title_bar, text='PassLock', bg=rgray, bd=0, fg='white',
-                                        font=("helvetica", 10), padx=21, pady=2,
-                                        highlightthickness=0)
-        # a canvas for the main area of the window
-        self.window.config(bg='black', highlightthickness=0)
-        # pack the widgets
-        title_bar.pack(fill='x')
-        self.close_button.pack(side='right')
-        self.expand_button.pack(side='right')
-        self.minimize_button.pack(side='right')
-        self.title_bar_title.pack(side='left', padx=20)
-        self.window.pack(expand=1, fill='both')
-
-        # Animation
-        self.close_button.bind('<Enter>', change_x_on_hovering)
-        self.close_button.bind('<Leave>', return_x_to_normalstate)
-        self.expand_button.bind('<Enter>', change_size_on_hovering)
-        self.expand_button.bind('<Leave>', return_size_on_hovering)
-        self.minimize_button.bind('<Enter>', change_m_size_on_hovering)
-        self.minimize_button.bind('<Leave>', return_m_size_on_hovering)
-        # check_map
-        self.master.bind('<Map>', check_map)  # added bindings to pass windows status to function
-        self.master.bind('<Unmap>', check_map)
-
     # Backend
     def encrypt(self, password):
         # generate a random salt
@@ -801,6 +966,7 @@ class Application(tk.Frame):
 
 
 if __name__ == "__main__":
+    # Create Datebase
     # Create object
     form = tk.Tk()
     app = Application(form)
