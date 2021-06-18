@@ -28,6 +28,7 @@ class Signup(tk.Frame):
         self.canvas.grid(row=0, column=0, columnspan=2)
         self.canvas.create_image(250, 60, image=self.img)
         # ---------------------------Program UI
+        
         self.new_password_label = tk.Label(self.frame1, text="                             New password:",
                                            font="Arial 10 bold", bg="pale turquoise")
         self.new_password_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.new_password)

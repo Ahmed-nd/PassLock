@@ -26,10 +26,8 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.master = master
-        self.master.iconbitmap('images/icon.ico')
-        self.master.title("PassLock")
-        self.master.geometry("1500x700")
-        self.master.resizable(1, 1)
+
+       
         # self.master.state('zoomed')
         # -------------------------------
         self.close_button = tk.Button()
@@ -611,43 +609,8 @@ class Application(tk.Frame):
         dark_mode_frame.grid(row=1, column=1)
 
     def show_app(self):
-        # ------------------------------Menu
-        # menu_bar = tk.Menu()
-        #
-        # file_menu_items = tk.Menu(menu_bar, tearoff=0)
-        #
-        # file_menu_items.add_command(label="All Folders", command=self.refresh_folder_table)
-        # file_menu_items.add_command(label="Settings...")
-        # file_menu_items.add_separator()
-        #
-        # file_menu_items.add_command(label="Exit", command=self.master.destroy)
-        #
-        # tools_menu_items = tk.Menu(menu_bar, tearoff=0)
-        #
-        # tools_menu_items.add_command(label="Auto Fill")
-        # tools_menu_items.add_command(label="Generate Password", command=self.generate_pass)
-        #
-        # help_menu_items = tk.Menu(menu_bar, tearoff=0)
-        #
-        # intro_url = "https://github.com/Ahmed-nd/PassLock#introduction"
-        # help_menu_items.add_command(label="Introduction", command=lambda link=intro_url: open_url(link))
-        # help_menu_items.add_separator()
-        # updates_url = "https://github.com/Ahmed-nd/PassLock#download"
-        # help_menu_items.add_command(label="Check for Updates...",
-        #                             command=lambda link=updates_url: open_url(link))
-        # license_url = "https://github.com/Ahmed-nd/PassLock#license"
-        # help_menu_items.add_command(label="License", command=lambda link=license_url: open_url(link))
-        # help_menu_items.add_separator()
-        #
-        about_url = "https://github.com/Ahmed-nd/PassLock#developers"
-        # help_menu_items.add_command(label="About", command=lambda link=about_url: open_url(link))
-        #
-        # menu_bar.add_cascade(label="File", menu=file_menu_items)
-        # menu_bar.add_cascade(label="Tools", menu=tools_menu_items)
-        # menu_bar.add_cascade(label="Help", menu=help_menu_items)
-        # self.master.config(menu=menu_bar)
 
-        # ---------------------------frame refresh
+        about_url = "https://github.com/Ahmed-nd/PassLock#developers"
 
         self.frame_left.config(bg=self.frame_left_color, relief="groove", borderwidth=2, padx=30,
                                pady=30)
@@ -710,6 +673,7 @@ class Application(tk.Frame):
         lgray = '#545454'
         dgray = '#242424'
         rgray = '#2e2e2e'
+        self.master.geometry("1500x700+20+60")
         self.master.overrideredirect(True)
         self.master.attributes('-topmost', True)
         title_bar = tk.Frame(self.master, bg='#2e2e2e', relief='raised', bd=0, highlightthickness=0, pady=4, padx=4)
@@ -753,9 +717,6 @@ class Application(tk.Frame):
         def check_map(event):  # apply override on deiconify.
             if str(event) == "<Map event>":
                 self.master.overrideredirect(1)
-                print('Deiconified', event)
-            else:
-                print('Iconified', event)
 
         def restore_down():
             if self.master.state() == 'normal':
@@ -764,21 +725,7 @@ class Application(tk.Frame):
             else:
                 self.master.overrideredirect(1)
                 self.master.state('normal')
-
-        def hide_screen(e):
-            # root.overrideredirect(False)
-            self.master.withdraw()
-            self.master.overrideredirect(0)
-            # self.master.update_idletasks()
-            # self.master.state('withdrawn')
-            self.master.state("iconic")
-
-        def screen_appear(e):
-            print(e)
-            self.master.overrideredirect(1)
-            # self.master.update_idletasks()
-            # self.master.state("normal")
-            # self.master.state('zoomed')
+                self.master.geometry("1500x700+20+60")
 
         # put a close button on the title bar
         self.close_button = tk.Button(title_bar, text='  X  ', command=self.master.destroy, bg=rgray, padx=2, pady=2,
