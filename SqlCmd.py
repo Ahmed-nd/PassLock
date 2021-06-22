@@ -74,5 +74,5 @@ def Fetchall( table):
     return rows
 
 if __name__ == "__main__":
-    conn = cx_Oracle.connect('APP/app@//localhost:1521/xe')
+    conn = cx_Oracle.connect('app/app@//localhost:1521/xe')
     conn.commit()

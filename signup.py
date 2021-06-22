@@ -1,8 +1,8 @@
 import os
 import tkinter as tk
 from tkinter import messagebox
-import DB
-
+import SqlCmd
+from Backend import checkpasswd as cp
 
 
 class Signup(tk.Frame):
@@ -63,23 +63,31 @@ class Signup(tk.Frame):
     def change(self, *_):
         new_password = self.new_password.get()
         confirm = self.confirm.get()
-        if len(new_password) == 0:
-            messagebox.showerror("PassLock", "Enter your password")
-        elif new_password == confirm and len(new_password) >= 8:
-            # store the new password in Database
-            # DB.InsertIntoAccount(self.username, )
-            file = open('password.txt', 'w')
-            file.seek(0, 0)
-            file.write(self.username.get() + '\n')
-            file.write(new_password)
-            self.master.destroy()
-            os.system('python login.py')
-            # bgLabel.destroy()
-            # return Login(self)
-        elif new_password == confirm and len(new_password) < 8:
-            messagebox.showerror("PassLock", "Your password is less than 8 characters")
+        val, whiceError = cp.password_check(new_password)
+        if val:
+            if new_password == confirm:
+                # store the new password in Database
+                # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+                SqlCmd.InsertIntoAccount(self.username.get(), new_password, 1,1)
+                # change file
+                self.master.destroy()
+                os.system('python login.py')
+            else:
+                messagebox.showerror("PassLock", "The password Doesn't match")
         else:
-            messagebox.showerror("PassLock", "Your password and confirmation password do not match")
+            if whiceError is 1:
+                messagebox.showerror("PassLock", "length should be at least 8")
+            elif whiceError is 2:
+                messagebox.showerror("PassLock", "length should be not be greater than 100")
+            elif whiceError is 3:
+                messagebox.showerror("PassLock", "Password should have at least one numeral")
+            elif whiceError is 4:
+                messagebox.showerror("PassLock", "Password should have at least one uppercase letter")
+            elif whiceError is 5:
+                messagebox.showerror("PassLock", "Password should have at least one lowercase letter")
+            elif whiceError is 6:
+                messagebox.showerror("PassLock", "Password should have at least one of the symbols $@#")
+
 
 
 if __name__ == "__main__":

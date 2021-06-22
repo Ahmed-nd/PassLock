@@ -1,8 +1,8 @@
 import os
 import tkinter as tk
 from tkinter import messagebox
-
-
+import SqlCmd
+from Backend import checkpasswd as cp
 class Login(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
@@ -58,20 +58,28 @@ class Login(tk.Frame):
         self.master.bind('<Return>', self.change_app)
 
     def change_app(self, *_):   
-        file = open('password.txt', 'r')
-        file.seek(0, 0)
-        content = file.read()
-        if content != '':
-            username, password = content.split('\n')
-            if password == self.password.get() and username == self.username.get():
+        # store the new password in Database
+        password = SqlCmd.FetchAccountPassword(self.username.get())
+        currPassword = self.password.get()
+        # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        val, whiceError = cp.password_check(currPassword)
+        if val:
+            if password == currPassword:
                 self.master.destroy()
                 os.system('python application.py')
-            elif password == '':
-                messagebox.showerror("PassLock", "Enter your password")
-            else:
-                messagebox.showerror("PassLock", "Wrong password")
         else:
-            messagebox.showerror("PassLock", "there is a problem with the account file")
+            if whiceError is 1:
+                messagebox.showerror("PassLock", "length should be at least 8")
+            elif whiceError is 2:
+                messagebox.showerror("PassLock", "length should be not be greater than 100")
+            elif whiceError is 3:
+                messagebox.showerror("PassLock", "Password should have at least one numeral")
+            elif whiceError is 4:
+                messagebox.showerror("PassLock", "Password should have at least one uppercase letter")
+            elif whiceError is 5:
+                messagebox.showerror("PassLock", "Password should have at least one lowercase letter")
+            elif whiceError is 6:
+                messagebox.showerror("PassLock", "Password should have at least one of the symbols $@#")
 
     def change_reset(self):
         self.master.destroy()
