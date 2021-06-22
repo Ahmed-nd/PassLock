@@ -2,6 +2,7 @@ import tkinter as tk
 import webbrowser
 from tkinter.messagebox import showinfo
 from tkinter import Text, messagebox
+from tkinter import ttk
 import search
 import SqlCmd
 
@@ -10,12 +11,14 @@ def OpenURL(self):
     print("Open Url : " + self)
     webbrowser.open_new(self)
 
+
 def FindInList(find, lst):
     lstIndex = []
     for i in range(0, len(lst)):
         if find == lst[i]:
             lstIndex.append(i)
     return lstIndex
+
 
 lastClickX = 0
 lastClickY = 0
@@ -49,10 +52,12 @@ class Application(tk.Frame):
         # ---------------------------frame right
         self.frame_right = tk.Frame(self.window)
         # ---------------------------Canvas right table
-        self.canvas_right_table = tk.Canvas(self.frame_right)
+        self.right_table_frame = tk.Frame(self.frame_right)
         self.frame_left.pack(side="left", fill='both', anchor='c')
-        self.frame_right.pack(side="left", expand='true', fill='both', anchor='c')
-        self.canvas_right_table.pack(side="top", fill='both', anchor='c', padx=30, expand='true')
+        self.frame_right.pack(side="left", expand='true',
+                              fill='both', anchor='c')
+        self.right_table_frame.pack(
+            side="top", fill='both', anchor='c', padx=30, expand='true')
 
         # database 1
         self.folder_lst = []
@@ -64,9 +69,31 @@ class Application(tk.Frame):
         self.account_lst = []
         self.account_lst_wid = []
         self.account_bg_color = []
-        # ---------------------------Table
-        self.tab1 = tk.Frame(self.canvas_right_table)
-        self.add_btn = tk.Button(self.tab1)
+        # ---------------------------Table Scrollbar
+        # main Frame
+        self.table_main_frame = tk.Frame(self.right_table_frame)
+        self.table_main_frame.pack(fill="both", expand='true',)
+        # Canvas for the scrollbar
+        self.table_canvas = tk.Canvas(
+            self.table_main_frame, bg=self.canvas_right_table_color)
+        self.table_canvas.pack(side='left', fill="both", expand='true')
+        # add scrollbar to canvas
+        self.scrollbar = ttk.Scrollbar(
+            self.table_main_frame, orient='vertical', command=self.table_canvas.yview)
+        self.scrollbar.pack(side='right', fill="y")
+        # configure the canvas
+        self.table_canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.table_canvas.bind('<Configure>', lambda e: self.table_canvas.configure(
+            scrollregion=self.table_canvas.bbox("all")))
+        self.table_canvas.bind_all('<MouseWheel>', lambda e: self.table_canvas.yview_scroll(
+            int(-1*(e.delta/120)), "units"))
+        # the new frame
+        self.table_frame = tk.Frame(
+            self.table_canvas, pady=50, padx=70, bg=self.canvas_right_table_color)
+        # display the table frame in the window canvas
+        self.table_canvas.create_window((0, 0), window=self.table_frame)
+
+        self.add_btn = tk.Button(self.table_frame)
         self.HomePage()
 
     # GUI All the Application
@@ -79,7 +106,8 @@ class Application(tk.Frame):
         dgray = '#242424'
         rgray = '#2e2e2e'
         self.master.overrideredirect(True)
-        title_bar = tk.Frame(self.master, bg='#2e2e2e', relief='raised', bd=0, highlightthickness=0, pady=4, padx=4)
+        title_bar = tk.Frame(self.master, bg='#2e2e2e', relief='raised',
+                             bd=0, highlightthickness=0, pady=4, padx=4)
 
         def save_last_click_pos(event):
             global lastClickX, lastClickY
@@ -87,7 +115,8 @@ class Application(tk.Frame):
             lastClickY = event.y
 
         def dragging(event):
-            x, y = event.x - lastClickX + self.master.winfo_x(), event.y - lastClickY + self.master.winfo_y()
+            x, y = event.x - lastClickX + self.master.winfo_x(), event.y - lastClickY + \
+                self.master.winfo_y()
             self.master.geometry("+%s+%s" % (x, y))
 
         title_bar.bind('<B1-Motion>', dragging)
@@ -157,9 +186,10 @@ class Application(tk.Frame):
         self.minimize_button.bind('<Enter>', change_m_size_on_hovering)
         self.minimize_button.bind('<Leave>', return_m_size_on_hovering)
         # check_map
-        self.master.bind('<Map>', check_map)  # added bindings to pass windows status to function
+        # added bindings to pass windows status to function
+        self.master.bind('<Map>', check_map)
         self.master.bind('<Unmap>', check_map)
-  
+
     def HomePage(self):
         """
         Start the Application with new Variable
@@ -170,16 +200,15 @@ class Application(tk.Frame):
                                pady=30)
         self.frame_left.pack(side="left", fill='both', anchor='c')
         # ---------------------------frame right
-        self.frame_right.config(bg=self.frame_right_color, relief="groove", borderwidth=2, pady=30)
-        self.frame_right.pack(side="left", expand='true', fill='both', anchor='c')
+        self.frame_right.config(bg=self.frame_right_color,
+                                relief="groove", borderwidth=2, pady=30)
+        self.frame_right.pack(side="left", expand='true',
+                              fill='both', anchor='c')
         # ---------------------------Canvas right table
-        self.canvas_right_table.config(bg=self.canvas_right_table_color, relief="ridge",
-                                       borderwidth=2)
-        self.canvas_right_table.pack(side="top", fill='both', anchor='c', padx=30, expand='true')
-        # ---------------------------Table
-        self.tab1 = tk.Frame(self.canvas_right_table)
-        self.tab1.config(padx=20, pady=20, bg=self.canvas_right_table_color)
-        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
+        self.right_table_frame.config(bg=self.canvas_right_table_color, relief="ridge",
+                                      borderwidth=2)
+        self.right_table_frame.pack(
+            side="top", fill='both', anchor='c', padx=30, expand='true')
 
         # ------------------------------left
         btn_enter = tk.Button(self.frame_left, text="All Folders", font="Arial 10 bold", border=0,
@@ -196,43 +225,85 @@ class Application(tk.Frame):
         btn_enter = tk.Button(self.frame_left, text="Setting", font="Arial 10 bold", border=0, command=self.SettingPage,
                               bg=self.frame_left_color, activebackground=self.frame_left_color, fg=self.font_color)
         btn_enter.pack(pady=10)
-        btn_enter = tk.Button(self.frame_left, text="About", command=lambda link=about_url: OpenURL(link)
-                              , font="Arial 10 bold", border=0, fg=self.font_color,
+        btn_enter = tk.Button(self.frame_left, text="About", command=lambda link=about_url: OpenURL(link), font="Arial 10 bold", border=0, fg=self.font_color,
                               bg=self.frame_left_color, activebackground=self.frame_left_color)
         btn_enter.pack(pady=10)
-        # database 1 
+        # database 1
         # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
         self.folder_lst = [('Raj', 'View', 'Edit', 'Del'),
-                        ('Aaryan', 'View', 'Edit', 'Del'),
-                        ('Vaishnavi', 'View', 'Edit', 'Del'),
-                        ('Rachna', 'View', 'Edit', 'Del'),
-                        ('Shubham', 'View', 'Edit', 'Del')]
+                           ('Aaryan', 'View', 'Edit', 'Del'),
+                           ('Vaishnavi', 'View', 'Edit', 'Del'),
+                           ('Rachna', 'View', 'Edit', 'Del'),
+                           ('Aaryan', 'View', 'Edit', 'Del'),
+                           ('Vaishnavi', 'View', 'Edit', 'Del'),
+                           ('Rachna', 'View', 'Edit', 'Del'),
+                           ('Aaryan', 'View', 'Edit', 'Del'),
+                           ('Vaishnavi', 'View', 'Edit', 'Del'),
+                           ('Rachna', 'View', 'Edit', 'Del'),
+                           ('Aaryan', 'View', 'Edit', 'Del'),
+                           ('Vaishnavi', 'View', 'Edit', 'Del'),
+                           ('Rachna', 'View', 'Edit', 'Del'),
+                           ('Aaryan', 'View', 'Edit', 'Del'),
+                           ('Vaishnavi', 'View', 'Edit', 'Del'),
+                           ('Rachna', 'View', 'Edit', 'Del'),
+                           ('Aaryan', 'View', 'Edit', 'Del'),
+                           ('Vaishnavi', 'View', 'Edit', 'Del'),
+                           ('Rachna', 'View', 'Edit', 'Del'),
+                           ('Shubham', 'View', 'Edit', 'Del')]
         # if db_Fetch_folder_table:
         #     for i in range(len(db_Fetch_folder_table)):
         #         t = list(self.folder_lst[row])
         #         t[i] = name
         #         self.folder_lst[row] = tuple(t)
-        # Vaiables for Folder     
-        self.folder_lst_tkinter = [] 
+        # Vaiables for Folder
+        self.folder_lst_tkinter = []
         self.folder_lst_wid = [30, 10, 10, 10]
         self.folder_name = tk.StringVar()
-        self.folder_bg_color = ['light cyan', 'royal blue', 'lawn green', 'firebrick1']
+        self.folder_bg_color = ['light cyan',
+                                'royal blue', 'lawn green', 'firebrick1']
         # Vaiables for account
         self.account_lst = []
         self.account_fold_name = ''
-        self.account_lst_wid = [15, 20, 15, 15,10, 20, 10]
+        self.account_lst_wid = [15, 20, 15, 15, 10, 20, 10]
         self.account_web = tk.StringVar()
         self.account_url = tk.StringVar()
         self.account_username = tk.StringVar()
         self.account_password = tk.StringVar()
-        self.account_bg_color = ['light cyan', 'light cyan', 'light cyan', 'light cyan' , 'royal blue', 'lawn green', 'firebrick1']
+        self.account_bg_color = ['light cyan', 'light cyan', 'light cyan',
+                                 'light cyan', 'royal blue', 'lawn green', 'firebrick1']
         # add btn
-        self.add_btn = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
+        self.add_btn = tk.Button(self.table_frame, text="+", font="Arial 12 bold", border=2, width=2,
                                  relief='groove', bg="lawn green", activebackground='green2',
                                  command=self.InsertFolder, fg=self.font_color)
         self.FolderTablePage()
+
+    def TableReset(self):
+        self.table_main_frame.destroy()
+        self.table_main_frame = tk.Frame(self.right_table_frame)
+        self.table_main_frame.pack(fill="both", expand='true',)
+        # Canvas for the scrollbar
+        self.table_canvas = tk.Canvas(
+            self.table_main_frame, bg=self.canvas_right_table_color)
+        self.table_canvas.pack(side='left', fill="both", expand='true')
+        # add scrollbar to canvas
+        self.scrollbar = ttk.Scrollbar(
+            self.table_main_frame, orient='vertical', command=self.table_canvas.yview)
+        self.scrollbar.pack(side='right', fill="y")
+        # configure the canvas
+        self.table_canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.table_canvas.bind('<Configure>', lambda e: self.table_canvas.configure(
+            scrollregion=self.table_canvas.bbox("all")))
+        self.table_canvas.bind_all('<MouseWheel>', lambda e: self.table_canvas.yview_scroll(
+            int(-1*(e.delta/120)), "units"))
+        # the new frame
+        self.table_frame = tk.Frame(
+            self.table_canvas, pady=50, padx=20, bg=self.canvas_right_table_color)
+        # display the table frame in the window canvas
+        self.table_canvas.create_window((0, 0), window=self.table_frame)
+
     # GUI Folder table
     # ------------------------------------------------------------------------
+
     def FolderTablePage(self):
         """
         show all the Folders in database
@@ -240,16 +311,19 @@ class Application(tk.Frame):
 
         def Find(search):
             print('search:' + search)
-            names_folderlst = [element[0].lower() for element in self.folder_lst]
+            names_folderlst = [element[0].lower()
+                               for element in self.folder_lst]
             if search.lower() in names_folderlst:
                 search_indexs = FindInList(search.lower(), names_folderlst)
                 curr_index = search_indexs[0]
                 top = tk.Toplevel()
-                top.title(f"PassLock || The Folder Number is {curr_index + 1} ")
+                top.title(
+                    f"PassLock || The Folder Number is {curr_index + 1} ")
                 top.iconbitmap("images\icon.ico")
                 top.resizable(0, 0)
                 top.geometry("+100+150")
-                top_frame = tk.Frame(top, padx=20, pady=20, bg=self.canvas_right_table_color)
+                top_frame = tk.Frame(top, padx=20, pady=20,
+                                     bg=self.canvas_right_table_color)
                 top_frame.pack()
                 print(curr_index)
 
@@ -264,9 +338,11 @@ class Application(tk.Frame):
                         top.destroy()
                         self.folder_lst[curr_index] = tuple(t)
                         self.FolderTableRefresh()
-                        
+
                     else:
-                        messagebox.showerror("PassLock", "Please Enter the data")
+                        messagebox.showerror(
+                            "PassLock", "Please Enter the data")
+
                 def visit_fun():
                     top.destroy()
                     self.FolderTableTools(curr_index, 1)
@@ -276,66 +352,68 @@ class Application(tk.Frame):
                     self.FolderTableTools(curr_index, 3)
 
                 # Data Frame Entry
-                entry_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                entry_frame = tk.Frame(
+                    top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
                 entry_frame.pack()
 
-                folder_name_label = tk.Label(entry_frame, text="Name:",font="Arial 14 bold", bg=self.canvas_right_table_color)
+                folder_name_label = tk.Label(
+                    entry_frame, text="Name:", font="Arial 14 bold", bg=self.canvas_right_table_color)
                 folder_name_label.grid(row=0, column=0, pady=2)
 
                 folder_name_entry = tk.Entry(entry_frame, width=30,
-                                            font="Arial 12 bold", relief='raised',
-                                            textvariable=self.folder_name)
+                                             font="Arial 12 bold", relief='raised',
+                                             textvariable=self.folder_name)
                 self.folder_name.set(self.folder_lst[curr_index][0])
                 folder_name_entry.grid(row=0, column=1, padx=20, pady=2)
 
                 #  right side btn add/cancel
-                btn_frame_right = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                btn_frame_right = tk.Frame(
+                    top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
                 btn_frame_right.pack(side="right")
                 cancel_btn = tk.Button(btn_frame_right, text="Cancel", font="Arial 12 bold", border=2, width=15,
-                                        bg="red", activebackground='red2',
-                                        command=top.destroy, )
+                                       bg="red", activebackground='red2',
+                                       command=top.destroy, )
 
                 cancel_btn.grid(row=0, column=0, pady=2)
 
                 delete_btn = tk.Button(btn_frame_right, text=self.folder_lst[0][3], width=15,
-                                        bg=self.folder_bg_color[3],
-                                        font="Arial 12 bold", activebackground='antique white',
-                                        command=delete_fun)
+                                       bg=self.folder_bg_color[3],
+                                       font="Arial 12 bold", activebackground='antique white',
+                                       command=delete_fun)
                 delete_btn.grid(row=1, column=0, pady=2)
 
-                
-
-                # left side btn add/cancel 
-                btn_frame_left = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                # left side btn add/cancel
+                btn_frame_left = tk.Frame(
+                    top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
                 btn_frame_left.pack(side="left")
 
                 visit_btn = tk.Button(btn_frame_left, text=self.folder_lst[0][1], width=15,
-                                        bg=self.folder_bg_color[1],
-                                        font="Arial 12 bold", activebackground='antique white',
-                                        command=visit_fun)
+                                      bg=self.folder_bg_color[1],
+                                      font="Arial 12 bold", activebackground='antique white',
+                                      command=visit_fun)
                 visit_btn.grid(row=1, column=0, pady=2)
 
                 edit_btn = tk.Button(btn_frame_left, text="Edit", font="Arial 12 bold", border=2, width=15,
-                                        bg="lawn green", activebackground='green2',
-                                        command=add, )
+                                     bg="lawn green", activebackground='green2',
+                                     command=add, )
                 edit_btn.grid(row=2, column=0, pady=2)
             else:
-                messagebox.showerror("PassLock || Search error", "Folder name not found")
+                messagebox.showerror(
+                    "PassLock || Search error", "Folder name not found")
 
-        
         # floral white
-        filename = tk.Label(self.tab1, text="Folders:", width=10, bg=self.canvas_right_table_color,
+        filename = tk.Label(self.table_frame, text="Folders:", width=10, bg=self.canvas_right_table_color,
                             font="Times 26 bold", )
         filename.grid(row=0, column=0, pady=25)
         # Search box
-        search.SearchBox(self.tab1, command=Find, placeholder="Type and press enter",
+        search.SearchBox(self.table_frame, command=Find, placeholder="Type and press enter",
                          button_foreground=self.font_color,
                          entry_highlightthickness=0, entry_width=40).grid(row=0, column=3, columnspan=3)
         # menu
         lst_menu = ['Name', 'tools']
         lst_menu_wid = [30, 33]
         for i in range(2, len(lst_menu) + 2):
-            e = tk.Label(self.tab1, text=lst_menu[i - 2], width=lst_menu_wid[i - 2], fg=self.font_color,
+            e = tk.Label(self.table_frame, text=lst_menu[i - 2], width=lst_menu_wid[i - 2], fg=self.font_color,
                          font="Arial 12 bold", relief='groove', bg=self.frame_left_color, )
             e.grid(row=1, column=i, pady=2)
             if i == 3:
@@ -346,16 +424,16 @@ class Application(tk.Frame):
         total_columns = len(self.folder_lst[0])
         for i in range(2, total_rows + 2):
             temp_tk = []
-            e = tk.Label(self.tab1, text=(i - 1), width=5, bg=self.frame_left_color, fg=self.font_color,
+            e = tk.Label(self.table_frame, text=(i - 1), width=5, bg=self.frame_left_color, fg=self.font_color,
                          font="Arial 12 bold", relief='groove', )
             e.grid(row=i, column=1, padx=2, pady=2, sticky='e')
             temp_tk.append(e)
             for j in range(2, total_columns + 2):
                 if j == 2:
-                    e = tk.Label(self.tab1, text=self.folder_lst[i - 2][j - 2], width=self.folder_lst_wid[j - 2], bg=self.folder_bg_color[j - 2],
+                    e = tk.Label(self.table_frame, text=self.folder_lst[i - 2][j - 2], width=self.folder_lst_wid[j - 2], bg=self.folder_bg_color[j - 2],
                                  font="Arial 12 bold", relief='groove', )
                 else:
-                    e = tk.Button(self.tab1, text=self.folder_lst[i - 2][j - 2], width=self.folder_lst_wid[j - 2],
+                    e = tk.Button(self.table_frame, text=self.folder_lst[i - 2][j - 2], width=self.folder_lst_wid[j - 2],
                                   bg=self.folder_bg_color[j - 2],
                                   font="Arial 12 bold", activebackground='antique white',
                                   command=lambda row=i - 2, column=j - 2: self.FolderTableTools(row, column))
@@ -368,21 +446,16 @@ class Application(tk.Frame):
                 temp_tk[4]['state'] = 'disable'
             self.folder_lst_tkinter.append(temp_tk)
 
-        self.add_btn = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
+        self.add_btn = tk.Button(self.table_frame, text="+", font="Arial 12 bold", border=2, width=2,
                                  relief='groove', bg="lawn green", activebackground='green2',
                                  command=self.InsertFolder, )
-        # User can't add more that 12 folder
-        if total_rows == 12:
-            self.add_btn['state'] = 'disable'
         self.add_btn.grid(row=total_rows + 1, column=total_columns + 3)
 
     def FolderTableRefresh(self):
         """
         refresh the folders with new frame (new data)
         """
-        self.tab1.destroy()
-        self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg=self.canvas_right_table_color)
-        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
+        self.TableReset()
         self.FolderTablePage()
 
     def FolderTableTools(self, row, column):
@@ -408,14 +481,15 @@ class Application(tk.Frame):
                     self.folder_lst[row] = tuple(t)
                     self.FolderTableRefresh()
                 else:
-                    messagebox.showerror("PassLock || Adding error", "Enter folder name")
+                    messagebox.showerror(
+                        "PassLock || Adding error", "Enter folder name")
 
             self.add_btn.destroy()
-            self.add_btn = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
+            self.add_btn = tk.Button(self.table_frame, text="+", font="Arial 12 bold", border=2, width=2,
                                      relief='groove', bg="lawn green", activebackground='green2',
                                      command=add, )
             self.add_btn.grid(row=row + 2, column=6)
-            folder_name_entry = tk.Entry(self.tab1, width=self.folder_lst_wid[0] + 3,
+            folder_name_entry = tk.Entry(self.table_frame, width=self.folder_lst_wid[0] + 3,
                                          font="Arial 12 bold", relief='groove',
                                          textvariable=self.folder_name, )
             self.folder_name.set(self.folder_lst[row][0])
@@ -426,14 +500,33 @@ class Application(tk.Frame):
             """
             get the folder's accounts database
             """
-            self.tab1.destroy()
-            self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg=self.canvas_right_table_color)
-            self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-            self.account_lst = [('Google','www.Google.com', 'go354', '123', 'Visit', 'View & Edit', 'Del'),
-                               ('Google','www.Google.com', 'go121', '321', 'Visit', 'View & Edit', 'Del'),
-                               ('Facebook','www.Facebook.com', 'face12354', '231', 'Visit', 'View & Edit', 'Del'),
-                               ('youtube','www.youtube.com', 'yo4453', '132', 'Visit', 'View & Edit', 'Del'),
-                               ('Coursera','www.Coursera.com', 'Cour1234', '312', 'Visit', 'View & Edit', 'Del')]
+            self.TableReset()
+            self.account_lst = [('Google', 'www.Google.com', 'go354', '123', 'Visit', 'View & Edit', 'Del'),
+                                ('Google', 'www.Google.com', 'go121',
+                                 '321', 'Visit', 'View & Edit', 'Del'),
+                                ('Facebook', 'www.Facebook.com', 'face12354',
+                                 '231', 'Visit', 'View & Edit', 'Del'),
+                                ('youtube', 'www.youtube.com', 'yo4453',
+                                 '132', 'Visit', 'View & Edit', 'Del'),
+                                ('Google', 'www.Google.com', 'go121',
+                                 '321', 'Visit', 'View & Edit', 'Del'),
+                                ('Facebook', 'www.Facebook.com', 'face12354',
+                                 '231', 'Visit', 'View & Edit', 'Del'),
+                                ('youtube', 'www.youtube.com', 'yo4453',
+                                 '132', 'Visit', 'View & Edit', 'Del'),
+                                ('Google', 'www.Google.com', 'go121',
+                                 '321', 'Visit', 'View & Edit', 'Del'),
+                                ('Facebook', 'www.Facebook.com', 'face12354',
+                                 '231', 'Visit', 'View & Edit', 'Del'),
+                                ('youtube', 'www.youtube.com', 'yo4453',
+                                 '132', 'Visit', 'View & Edit', 'Del'),
+                                ('Google', 'www.Google.com', 'go121',
+                                 '321', 'Visit', 'View & Edit', 'Del'),
+                                ('Facebook', 'www.Facebook.com', 'face12354',
+                                 '231', 'Visit', 'View & Edit', 'Del'),
+                                ('youtube', 'www.youtube.com', 'yo4453',
+                                 '132', 'Visit', 'View & Edit', 'Del'),
+                                ('Coursera', 'www.Coursera.com', 'Cour1234', '312', 'Visit', 'View & Edit', 'Del')]
             self.account_fold_name = self.folder_lst[row][0]
             self.AccountTablePage()
 
@@ -450,13 +543,15 @@ class Application(tk.Frame):
             print("add")
             folder_name = self.folder_name.get()
             if folder_name != '':
-                temp_lst = [folder_name, self.folder_lst[0][1], self.folder_lst[0][2], self.folder_lst[0][3]]
+                temp_lst = [folder_name, self.folder_lst[0][1],
+                            self.folder_lst[0][2], self.folder_lst[0][3]]
                 temp_lst = tuple(temp_lst)
                 self.folder_lst.append(temp_lst)
-                top.destroy() 
+                top.destroy()
             else:
-                messagebox.showerror("PassLock || Adding error", "Please Enter the data")
-            self.FolderTableRefresh() 
+                messagebox.showerror(
+                    "PassLock || Adding error", "Please Enter the data")
+            self.FolderTableRefresh()
 
         def cancel_fun():
             top.destroy()
@@ -466,40 +561,44 @@ class Application(tk.Frame):
         top.iconbitmap("images\icon.ico")
         top.resizable(0, 0)
         top.geometry("+100+150")
-        top_frame = tk.Frame(top, padx=20, pady=20, bg=self.canvas_right_table_color)
+        top_frame = tk.Frame(top, padx=20, pady=20,
+                             bg=self.canvas_right_table_color)
         top_frame.pack()
 
-        self.add_btn.destroy()  
+        self.add_btn.destroy()
 
         # Data Frame Entry
-        entry_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+        entry_frame = tk.Frame(top_frame, padx=20, pady=20,
+                               bg=self.canvas_right_table_color)
         entry_frame.pack()
 
-        folder_name_label = tk.Label(entry_frame, text="Name:",font="Arial 14 bold", bg=self.canvas_right_table_color)
+        folder_name_label = tk.Label(
+            entry_frame, text="Name:", font="Arial 14 bold", bg=self.canvas_right_table_color)
         folder_name_label.grid(row=0, column=0, pady=2)
 
         folder_name_entry = tk.Entry(entry_frame, width=30,
-                                    font="Arial 12 bold", relief='raised',
-                                    textvariable=self.folder_name)
+                                     font="Arial 12 bold", relief='raised',
+                                     textvariable=self.folder_name)
         folder_name_entry.grid(row=0, column=1, padx=20, pady=2)
 
-        # rigth side btn add/cancel 
-        btn_frame_right = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+        # rigth side btn add/cancel
+        btn_frame_right = tk.Frame(
+            top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
         btn_frame_right.pack()
 
         cancel_btn = tk.Button(btn_frame_right, text="Cancel", font="Arial 12 bold", border=2, width=15,
-                                relief='groove', bg="red", activebackground='red2',
-                                command=cancel_fun, )
+                               relief='groove', bg="red", activebackground='red2',
+                               command=cancel_fun, )
         cancel_btn.grid(row=1, column=2, pady=2)
 
         add_btn = tk.Button(btn_frame_right, text="Add", font="Arial 12 bold", border=2, width=15,
-                                relief='groove', bg="lawn green", activebackground='green2',
-                                command=add, )
+                            relief='groove', bg="lawn green", activebackground='green2',
+                            command=add, )
         add_btn.grid(row=2, column=2, pady=2)
 
-        
-
     # GUI account table
+    # ------------------------------------------------------------------------
+
     def AccountTablePage(self):
         """
                 show all the accounts in database folder
@@ -512,6 +611,7 @@ class Application(tk.Frame):
                 search_indexs = FindInList(search.lower(), websites)
                 global top, curr_index, account_text_entry
                 curr_index = 0
+
                 def add():
                     print("add")
                     global account_text_entry
@@ -533,8 +633,9 @@ class Application(tk.Frame):
                         self.account_lst[search_indexs[curr_index]] = tuple(t)
                         self.AccountTableRefresh()
                     else:
-                        messagebox.showerror("PassLock || Search error", "Please Enter the data")
- 
+                        messagebox.showerror(
+                            "PassLock || Search error", "Please Enter the data")
+
                 def visit_fun():
                     self.AccountsTableTools(search_indexs[curr_index], 4)
 
@@ -557,101 +658,112 @@ class Application(tk.Frame):
                 def top_page():
                     global top, account_text_entry
                     top = tk.Toplevel()
-                    top.title(f"PassLock || The Account Number is {search_indexs[curr_index] + 1} ")
+                    top.title(
+                        f"PassLock || The Account Number is {search_indexs[curr_index] + 1} ")
                     top.iconbitmap("images\icon.ico")
                     top.resizable(0, 0)
                     top.geometry("+100+150")
-                    top_frame = tk.Frame(top, padx=20, pady=20, bg=self.canvas_right_table_color)
+                    top_frame = tk.Frame(
+                        top, padx=20, pady=20, bg=self.canvas_right_table_color)
                     top_frame.pack()
                     self.account_web = tk.StringVar()
                     self.account_url = tk.StringVar()
                     self.account_username = tk.StringVar()
                     self.account_password = tk.StringVar()
-                    
+
                     # next and previous Buttons
-                    change_next_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                    change_next_frame = tk.Frame(
+                        top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
                     change_next_frame.pack(fill='x')
                     next_btn = tk.Button(change_next_frame, text="Next", font="Arial 12 bold", border=2, width=10,
-                                            relief='groove', bg=self.frame_left_color,
-                                            command=next_fun,fg=self.font_color )
+                                         relief='groove', bg=self.frame_left_color,
+                                         command=next_fun, fg=self.font_color)
 
                     next_btn.pack(side='right')
                     previous_btn = tk.Button(change_next_frame, text="Previous", font="Arial 12 bold", border=2, width=10,
-                                            relief='groove', bg=self.frame_left_color,
-                                            command=previous_fun,fg=self.font_color )
+                                             relief='groove', bg=self.frame_left_color,
+                                             command=previous_fun, fg=self.font_color)
 
                     previous_btn.pack(side='left')
                     # Data Frame Entry
-                    entry_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                    entry_frame = tk.Frame(
+                        top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
                     entry_frame.pack()
-                    account_web_label = tk.Label(entry_frame, text="       Website :  ",font="Arial 14 bold",
-                    bg=self.canvas_right_table_color)
+                    account_web_label = tk.Label(entry_frame, text="       Website :  ", font="Arial 14 bold",
+                                                 bg=self.canvas_right_table_color)
                     account_web_label.grid(row=0, column=0, pady=2)
                     account_web_entry = tk.Entry(entry_frame, width=30,
-                                                font="Arial 12 bold",
-                                                textvariable=self.account_web)
-                    self.account_web.set(self.account_lst[search_indexs[curr_index]][0])
+                                                 font="Arial 12 bold",
+                                                 textvariable=self.account_web)
+                    self.account_web.set(
+                        self.account_lst[search_indexs[curr_index]][0])
                     account_web_entry.grid(row=0, column=1, pady=2)
 
-                    account_url_label = tk.Label(entry_frame, text="              URL :  ",font="Arial 14 bold",
-                        bg=self.canvas_right_table_color)
-                    account_url_label.grid(row=1, column=0, pady=2)       
+                    account_url_label = tk.Label(entry_frame, text="              URL :  ", font="Arial 14 bold",
+                                                 bg=self.canvas_right_table_color)
+                    account_url_label.grid(row=1, column=0, pady=2)
                     account_url_entry = tk.Entry(entry_frame, width=30,
-                                                font="Arial 12 bold",
-                                                textvariable=self.account_url)
-                    self.account_url.set(self.account_lst[search_indexs[curr_index]][1])
+                                                 font="Arial 12 bold",
+                                                 textvariable=self.account_url)
+                    self.account_url.set(
+                        self.account_lst[search_indexs[curr_index]][1])
                     account_url_entry.grid(row=1, column=1, pady=2)
 
-                    account_username_label = tk.Label(entry_frame, text="   Username :  ",font="Arial 14 bold",
-                    bg=self.canvas_right_table_color)
+                    account_username_label = tk.Label(entry_frame, text="   Username :  ", font="Arial 14 bold",
+                                                      bg=self.canvas_right_table_color)
                     account_username_label.grid(row=2, column=0, pady=2)
                     account_username_entry = tk.Entry(entry_frame, width=30,
-                                                font="Arial 12 bold",
-                                                textvariable=self.account_username)
-                    self.account_username.set(self.account_lst[search_indexs[curr_index]][2])
+                                                      font="Arial 12 bold",
+                                                      textvariable=self.account_username)
+                    self.account_username.set(
+                        self.account_lst[search_indexs[curr_index]][2])
                     account_username_entry.grid(row=2, column=1, pady=2)
 
-                    account_password_label = tk.Label(entry_frame, text="   Password :  ",font="Arial 14 bold",
-                    bg=self.canvas_right_table_color)
+                    account_password_label = tk.Label(entry_frame, text="   Password :  ", font="Arial 14 bold",
+                                                      bg=self.canvas_right_table_color)
                     account_password_label.grid(row=3, column=0, pady=2)
                     account_password_entry = tk.Entry(entry_frame, width=30,
-                                                font="Arial 12 bold",
-                                                textvariable=self.account_password)
-                    self.account_password.set(self.account_lst[search_indexs[curr_index]][3])
+                                                      font="Arial 12 bold",
+                                                      textvariable=self.account_password)
+                    self.account_password.set(
+                        self.account_lst[search_indexs[curr_index]][3])
                     account_password_entry.grid(row=3, column=1, pady=2)
 
-                    account_text_label = tk.Label(entry_frame, text=" Secret Note :  ",font="Arial 14 bold",
-                                                bg=self.canvas_right_table_color)
+                    account_text_label = tk.Label(entry_frame, text=" Secret Note :  ", font="Arial 14 bold",
+                                                  bg=self.canvas_right_table_color)
                     account_text_label.grid(row=4, column=0, pady=2)
-                    account_text_entry = tk.Text(entry_frame, width=30,height=10,
-                                                font="Arial 12 bold", relief='raised')
-                    account_text_entry.insert('1.0',"get data from the database")
+                    account_text_entry = tk.Text(entry_frame, width=30, height=10,
+                                                 font="Arial 12 bold", relief='raised')
+                    account_text_entry.insert(
+                        '1.0', "get data from the database")
                     account_text_entry.grid(row=4, column=1, pady=5)
-                            
-                    # right side btn add/cancel 
-                    right_btn_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+
+                    # right side btn add/cancel
+                    right_btn_frame = tk.Frame(
+                        top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
                     right_btn_frame.pack(side='right')
                     cancel_btn = tk.Button(right_btn_frame, text="Cancel", font="Arial 12 bold", border=2, width=15,
-                                            relief='groove', bg="red", activebackground='red2',
-                                            command=top.destroy, )
+                                           relief='groove', bg="red", activebackground='red2',
+                                           command=top.destroy, )
 
                     cancel_btn.grid(row=0, column=0, pady=2)
                     add_btn = tk.Button(right_btn_frame, text=self.account_lst[search_indexs[curr_index]][6], font="Arial 12 bold",
-                                            border=2, width=15,
-                                            bg=self.account_bg_color[6], activebackground='antique white',
-                                            command=delete_fun, relief='groove')
+                                        border=2, width=15,
+                                        bg=self.account_bg_color[6], activebackground='antique white',
+                                        command=delete_fun, relief='groove')
                     add_btn.grid(row=1, column=0, pady=2)
-                    # left side btn add/cancel 
-                    left_btn_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+                    # left side btn add/cancel
+                    left_btn_frame = tk.Frame(
+                        top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
                     left_btn_frame.pack()
                     visit_btn = tk.Button(left_btn_frame, text=self.account_lst[search_indexs[curr_index]][4], font="Arial 12 bold", border=2, width=15,
-                                            relief='groove', bg=self.account_bg_color[4], activebackground='antique white',
-                                            command=visit_fun, )
+                                          relief='groove', bg=self.account_bg_color[4], activebackground='antique white',
+                                          command=visit_fun, )
 
                     visit_btn.grid(row=0, column=0, pady=2)
                     edit_btn = tk.Button(left_btn_frame, text="Save", font="Arial 12 bold", border=2, width=15,
-                                            relief='groove', bg="lawn green", activebackground='green2',
-                                            command=add, )
+                                         relief='groove', bg="lawn green", activebackground='green2',
+                                         command=add, )
                     edit_btn.grid(row=1, column=0, pady=2)
 
                     if curr_index == 0:
@@ -661,24 +773,22 @@ class Application(tk.Frame):
                     if curr_index == len(search_indexs) - 1:
                         next_btn['state'] = 'disable'
                     else:
-                        next_btn['state'] = 'normal'    
+                        next_btn['state'] = 'normal'
                 top_page()
             else:
                 messagebox.showerror("PassLock", "Folder name not found")
 
-
         # folder name
-        filename = tk.Label(self.tab1, text=self.account_fold_name + ":", width=40, bg=self.canvas_right_table_color,
+        filename = tk.Label(self.table_frame, text=self.account_fold_name + ":", width=40, bg=self.canvas_right_table_color,
                             font="Times 26 bold", anchor='w')
         filename.grid(row=0, column=0, pady=25, columnspan=10, sticky='w')
         # search box
-        search.SearchBox(self.tab1, command=Find, placeholder="Type and press enter",
-                         entry_highlightthickness=0, button_foreground=self.font_color
-                         , entry_width=40).grid(row=0, column=6, columnspan=3)
-        lst_menu = ['Website','URL', 'Username', 'Password', 'Tools']
-        lst_menu_wid = [15, 20,15, 15, 44]
+        search.SearchBox(self.table_frame, command=Find, placeholder="Type and press enter",
+                         entry_highlightthickness=0, button_foreground=self.font_color, entry_width=40).grid(row=0, column=6, columnspan=3)
+        lst_menu = ['Website', 'URL', 'Username', 'Password', 'Tools']
+        lst_menu_wid = [15, 20, 15, 15, 44]
         for i in range(2, len(lst_menu) + 2):
-            e = tk.Label(self.tab1, text=lst_menu[i - 2], width=lst_menu_wid[i - 2],
+            e = tk.Label(self.table_frame, text=lst_menu[i - 2], width=lst_menu_wid[i - 2],
                          font="Arial 12 bold", relief='groove', fg=self.font_color, bg=self.frame_left_color)
             e.grid(row=1, column=i, pady=2)
             if i == 6:
@@ -689,19 +799,20 @@ class Application(tk.Frame):
         total_columns = len(self.account_lst[0])
         for i in range(2, total_rows + 2):
             temp_tk = []
-            e = tk.Label(self.tab1, text=(i - 1), width=5,
+            e = tk.Label(self.table_frame, text=(i - 1), width=5,
                          font="Arial 12 bold", relief='groove', fg=self.font_color, bg=self.frame_left_color)
             e.grid(row=i, column=1, padx=2, pady=2)
             temp_tk.append(e)
             for j in range(2, total_columns + 2):
                 if j <= 5:
-                    e = tk.Label(self.tab1, text=self.account_lst[i - 2][j - 2], width=self.account_lst_wid[j - 2],
+                    e = tk.Label(self.table_frame, text=self.account_lst[i - 2][j - 2], width=self.account_lst_wid[j - 2],
                                  bg=self.account_bg_color[j - 2], font="Arial 12 bold", relief='groove', )
                 else:
-                    e = tk.Button(self.tab1, text=self.account_lst[i - 2][j - 2], width=self.account_lst_wid[j - 2],
-                                  bg=self.account_bg_color[j - 2], font="Arial 12 bold",
+                    e = tk.Button(self.table_frame, text=self.account_lst[i - 2][j - 2], width=self.account_lst_wid[j - 2],
+                                  bg=self.account_bg_color[j -
+                                                           2], font="Arial 12 bold",
                                   activebackground='antique white',
-                                  command=lambda row=i - 2, column=j - 2:self.AccountsTableTools(row, column))
+                                  command=lambda row=i - 2, column=j - 2: self.AccountsTableTools(row, column))
                 temp_tk.append(e)
                 e.grid(row=i, column=j, padx=2, pady=2)
 
@@ -711,20 +822,16 @@ class Application(tk.Frame):
             self.folder_lst_tkinter.append(temp_tk)
 
             # self.e.insert(END, folder_lst[i][j])
-        self.add_btn = tk.Button(self.tab1, text="+", font="Arial 12 bold", border=2, width=2,
+        self.add_btn = tk.Button(self.table_frame, text="+", font="Arial 12 bold", border=2, width=2,
                                  relief='groove', bg="lawn green", activebackground='green2',
                                  command=self.InsertAccount)
-        if total_rows == 12:
-            self.add_btn['state'] = 'disable'
         self.add_btn.grid(row=total_rows + 1, column=total_columns + 3)
 
     def AccountTableRefresh(self):
         """
         refresh the folders with new frame (new data)
         """
-        self.tab1.destroy()
-        self.tab1 = tk.Frame(self.canvas_right_table, padx=20, pady=20, bg=self.canvas_right_table_color)
-        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
+        self.TableReset()
         self.AccountTablePage()
 
     def AccountsTableTools(self, row, column):
@@ -743,18 +850,19 @@ class Application(tk.Frame):
             # Create Top level
             # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
             top = tk.Toplevel()
-            top.title(f"PassLock || Viewing and editing account number {row + 1}")
+            top.title(
+                f"PassLock || Viewing and editing account number {row + 1}")
             top.iconbitmap("images\icon.ico")
             top.resizable(0, 0)
             top.geometry("+100+150")
 
-            top_frame = tk.Frame(top, padx=20, pady=20, bg=self.canvas_right_table_color)
+            top_frame = tk.Frame(top, padx=20, pady=20,
+                                 bg=self.canvas_right_table_color)
             top_frame.pack()
             self.account_web = tk.StringVar()
             self.account_url = tk.StringVar()
             self.account_username = tk.StringVar()
             self.account_password = tk.StringVar()
-
 
             def add():
                 print("add")
@@ -776,56 +884,59 @@ class Application(tk.Frame):
                     self.account_lst[row] = tuple(t)
                     self.AccountTableRefresh()
                 else:
-                    messagebox.showerror("PassLock || Viewing and editing account error", "Please Enter the data")
+                    messagebox.showerror(
+                        "PassLock || Viewing and editing account error", "Please Enter the data")
 
             # Data Frame Entry
-            entry_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+            entry_frame = tk.Frame(
+                top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
             entry_frame.pack()
-            account_web_label = tk.Label(entry_frame, text="       Website :  ",font="Arial 14 bold",
-            bg=self.canvas_right_table_color)
+            account_web_label = tk.Label(entry_frame, text="       Website :  ", font="Arial 14 bold",
+                                         bg=self.canvas_right_table_color)
             account_web_label.grid(row=0, column=0, pady=2)
             account_web_entry = tk.Entry(entry_frame, width=30,
-                                        font="Arial 12 bold",
-                                        textvariable=self.account_web)
+                                         font="Arial 12 bold",
+                                         textvariable=self.account_web)
             self.account_web.set(self.account_lst[row][0])
             account_web_entry.grid(row=0, column=1, pady=2)
 
-            account_url_label = tk.Label(entry_frame, text="              URL :  ",font="Arial 14 bold",
-                bg=self.canvas_right_table_color)
-            account_url_label.grid(row=1, column=0, pady=2)       
+            account_url_label = tk.Label(entry_frame, text="              URL :  ", font="Arial 14 bold",
+                                         bg=self.canvas_right_table_color)
+            account_url_label.grid(row=1, column=0, pady=2)
             account_url_entry = tk.Entry(entry_frame, width=30,
-                                        font="Arial 12 bold",
-                                        textvariable=self.account_url)
+                                         font="Arial 12 bold",
+                                         textvariable=self.account_url)
             self.account_url.set(self.account_lst[row][1])
             account_url_entry.grid(row=1, column=1, pady=2)
 
-            account_username_label = tk.Label(entry_frame, text="   Username :  ",font="Arial 14 bold",
-            bg=self.canvas_right_table_color)
+            account_username_label = tk.Label(entry_frame, text="   Username :  ", font="Arial 14 bold",
+                                              bg=self.canvas_right_table_color)
             account_username_label.grid(row=2, column=0, pady=2)
             account_username_entry = tk.Entry(entry_frame, width=30,
-                                        font="Arial 12 bold",
-                                        textvariable=self.account_username)
+                                              font="Arial 12 bold",
+                                              textvariable=self.account_username)
             self.account_username.set(self.account_lst[row][2])
             account_username_entry.grid(row=2, column=1, pady=2)
 
-            account_password_label = tk.Label(entry_frame, text="   Password :  ",font="Arial 14 bold",
-            bg=self.canvas_right_table_color)
+            account_password_label = tk.Label(entry_frame, text="   Password :  ", font="Arial 14 bold",
+                                              bg=self.canvas_right_table_color)
             account_password_label.grid(row=3, column=0, pady=2)
             account_password_entry = tk.Entry(entry_frame, width=30,
-                                        font="Arial 12 bold",
-                                        textvariable=self.account_password)
+                                              font="Arial 12 bold",
+                                              textvariable=self.account_password)
             self.account_password.set(self.account_lst[row][3])
             account_password_entry.grid(row=3, column=1, pady=2)
 
-            account_text_label = tk.Label(entry_frame, text=" Secret Note :  ",font="Arial 14 bold",
-                                        bg=self.canvas_right_table_color)
+            account_text_label = tk.Label(entry_frame, text=" Secret Note :  ", font="Arial 14 bold",
+                                          bg=self.canvas_right_table_color)
             account_text_label.grid(row=4, column=0, pady=2)
-            account_text_entry = tk.Text(entry_frame, width=30,height=10,
-                                        font="Arial 12 bold", relief='raised')
-            account_text_entry.insert('1.0',"get data from the database")
+            account_text_entry = tk.Text(entry_frame, width=30, height=10,
+                                         font="Arial 12 bold", relief='raised')
+            account_text_entry.insert('1.0', "get data from the database")
             account_text_entry.grid(row=4, column=1, pady=5)
             #  btn add/cancel
-            btn_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+            btn_frame = tk.Frame(top_frame, padx=20, pady=20,
+                                 bg=self.canvas_right_table_color)
             btn_frame.pack()
             self.add_btn = tk.Button(btn_frame, text="Cancel", font="Arial 12 bold", border=2, width=15,
                                      relief='groove', bg="red", activebackground='red2',
@@ -861,13 +972,14 @@ class Application(tk.Frame):
             Note = account_text_entry.get('1.0', tk.END)
             print(Note)
             if web != '' and username != '' and password != '' and url != '':
-                temp_lst = [web,url, username, password, self.account_lst[0][4], self.account_lst[0][5],
+                temp_lst = [web, url, username, password, self.account_lst[0][4], self.account_lst[0][5],
                             self.account_lst[0][6]]
                 temp_lst = tuple(temp_lst)
                 self.account_lst.append(temp_lst)
                 top.destroy()
             else:
-                messagebox.showerror("PassLock || Adding error", "Please Enter the data")
+                messagebox.showerror(
+                    "PassLock || Adding error", "Please Enter the data")
             self.AccountTableRefresh()
 
         def cancel_fun():
@@ -879,77 +991,81 @@ class Application(tk.Frame):
         top.iconbitmap("images\icon.ico")
         top.resizable(0, 0)
         top.geometry("+100+150")
-        top_frame = tk.Frame(top, padx=20, pady=20, bg=self.canvas_right_table_color)
+        top_frame = tk.Frame(top, padx=20, pady=20,
+                             bg=self.canvas_right_table_color)
         top_frame.pack()
         self.account_web = tk.StringVar()
         self.account_url = tk.StringVar()
         self.account_username = tk.StringVar()
         self.account_password = tk.StringVar()
 
-        self.add_btn.destroy()  
+        self.add_btn.destroy()
 
         # Data Frame Entry
-        entry_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+        entry_frame = tk.Frame(top_frame, padx=20, pady=20,
+                               bg=self.canvas_right_table_color)
         entry_frame.pack()
 
-        account_web_label = tk.Label(entry_frame, text="           Website :",font="Arial 14 bold",
-         bg=self.canvas_right_table_color)
+        account_web_label = tk.Label(entry_frame, text="           Website :", font="Arial 14 bold",
+                                     bg=self.canvas_right_table_color)
         account_web_label.grid(row=0, column=0, pady=2)
         account_web_entry = tk.Entry(entry_frame, width=30,
-                                    font="Arial 12 bold", relief='raised',
-                                    textvariable=self.account_web)
+                                     font="Arial 12 bold", relief='raised',
+                                     textvariable=self.account_web)
         account_web_entry.grid(row=0, column=1, pady=2)
 
-        account_url_label = tk.Label(entry_frame, text="                  URL :",font="Arial 14 bold",
-            bg=self.canvas_right_table_color)
-        account_url_label.grid(row=1, column=0, pady=2)       
+        account_url_label = tk.Label(entry_frame, text="                  URL :", font="Arial 14 bold",
+                                     bg=self.canvas_right_table_color)
+        account_url_label.grid(row=1, column=0, pady=2)
         account_url_entry = tk.Entry(entry_frame, width=30,
-                                    font="Arial 12 bold", relief='raised',
-                                    textvariable=self.account_url)
+                                     font="Arial 12 bold", relief='raised',
+                                     textvariable=self.account_url)
         account_url_entry.grid(row=1, column=1, padx=20, pady=2)
 
-        account_username_label = tk.Label(entry_frame, text="       Username :",font="Arial 14 bold",
-         bg=self.canvas_right_table_color)
+        account_username_label = tk.Label(entry_frame, text="       Username :", font="Arial 14 bold",
+                                          bg=self.canvas_right_table_color)
         account_username_label.grid(row=2, column=0, pady=2)
         account_username_entry = tk.Entry(entry_frame, width=30,
-                                    font="Arial 12 bold", relief='raised',
-                                    textvariable=self.account_username)
+                                          font="Arial 12 bold", relief='raised',
+                                          textvariable=self.account_username)
         account_username_entry.grid(row=2, column=1, padx=20, pady=2)
 
-        account_password_label = tk.Label(entry_frame, text="       Password :",font="Arial 14 bold",
-         bg=self.canvas_right_table_color)
+        account_password_label = tk.Label(entry_frame, text="       Password :", font="Arial 14 bold",
+                                          bg=self.canvas_right_table_color)
         account_password_label.grid(row=3, column=0, pady=2)
         account_password_entry = tk.Entry(entry_frame, width=30,
-                                    font="Arial 12 bold", relief='raised',
-                                    textvariable=self.account_password)
+                                          font="Arial 12 bold", relief='raised',
+                                          textvariable=self.account_password)
         account_password_entry.grid(row=3, column=1, padx=20, pady=2)
 
-        account_text_label = tk.Label(entry_frame, text="     Secret Note :",font="Arial 14 bold", bg=self.canvas_right_table_color)
+        account_text_label = tk.Label(
+            entry_frame, text="     Secret Note :", font="Arial 14 bold", bg=self.canvas_right_table_color)
         account_text_label.grid(row=4, column=0, pady=2)
-        account_text_entry = tk.Text(entry_frame, width=30,height=10,
-                                    font="Arial 12 bold", relief='raised')
+        account_text_entry = tk.Text(entry_frame, width=30, height=10,
+                                     font="Arial 12 bold", relief='raised')
         account_text_entry.grid(row=4, column=1, padx=20, pady=5)
         #  btn add/cancel
-        btn_frame = tk.Frame(top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
+        btn_frame = tk.Frame(top_frame, padx=20, pady=20,
+                             bg=self.canvas_right_table_color)
         btn_frame.pack()
         self.add_btn = tk.Button(btn_frame, text="Cancel", font="Arial 12 bold", border=2, width=15,
-                                relief='groove', bg="red", activebackground='red2',
-                                command=cancel_fun, )
+                                 relief='groove', bg="red", activebackground='red2',
+                                 command=cancel_fun, )
 
         self.add_btn.grid(row=5, column=1, pady=2)
         self.add_btn = tk.Button(btn_frame, text="Add", font="Arial 12 bold", border=2, width=15,
-                                relief='groove', bg="lawn green", activebackground='green2',
-                                command=add, )
+                                 relief='groove', bg="lawn green", activebackground='green2',
+                                 command=add, )
         self.add_btn.grid(row=6, column=1, pady=2)
 
     # GUI generate password
+    # ------------------------------------------------------------------------
+
     def GeneratePasswordPage(self):
 
         import random
         import array
-        self.tab1.destroy()
-        self.tab1 = tk.Frame(self.canvas_right_table, padx=100, pady=100, bg=self.canvas_right_table_color)
-        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
+        self.TableReset()
         strong_pass = tk.StringVar()
         current_value = tk.DoubleVar()
 
@@ -1013,12 +1129,15 @@ class Application(tk.Frame):
         def copy_text_to_clipboard():
             field_value = strong_pass.get()
             self.master.clipboard_clear()  # clear clipboard contents
-            self.master.clipboard_append(field_value)  # append new value to clipbaord
+            # append new value to clipbaord
+            self.master.clipboard_append(field_value)
 
         # Frame 1 generate_frame
-        generate_p_frame = tk.Frame(self.tab1, bg=self.canvas_right_table_color)
-        generate_p_frame.pack()
-        generate_frame = tk.Frame(generate_p_frame, bg=self.canvas_right_table_color)
+        generate_p_frame = tk.Frame(
+            self.table_frame, bg=self.canvas_right_table_color)
+        generate_p_frame.pack(pady=200, padx=280)
+        generate_frame = tk.Frame(
+            generate_p_frame, bg=self.canvas_right_table_color)
         generate_frame.pack(pady=10)
         strong_pass_entry = tk.Entry(generate_frame, width=50,
                                      font="Arial 12 bold", relief='groove',
@@ -1034,7 +1153,8 @@ class Application(tk.Frame):
                              command=copy_text_to_clipboard)
         btn_copy.pack(side='left')
         # Frame 2 pass_len_frame
-        pass_len_frame = tk.Frame(generate_p_frame, bg=self.canvas_right_table_color)
+        pass_len_frame = tk.Frame(
+            generate_p_frame, bg=self.canvas_right_table_color)
         pass_len_frame.pack()
         # scale Value
         current_value.set(5)
@@ -1043,20 +1163,22 @@ class Application(tk.Frame):
         scroll_num.pack(side='left')
 
     # GUI SettingPage
+    # ------------------------------------------------------------------------
+
     def SettingPage(self):
 
-        self.tab1.destroy()
-        self.tab1 = tk.Frame(self.canvas_right_table, padx=100, pady=100, bg=self.canvas_right_table_color)
-        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-        dark_mode_frame = tk.Frame(self.tab1, bg=self.canvas_right_table_color)
-        dark_mode_frame.grid(row=1, column=1)
+        self.TableReset()
+        frame = tk.Frame(self.table_frame, bg=self.canvas_right_table_color)
+        frame.grid(row=1, column=1)
+
+    # GUI AutoFill
+    # ------------------------------------------------------------------------
 
     def AutoFill(self):
-        self.tab1.destroy()
-        self.tab1 = tk.Frame(self.canvas_right_table, padx=100, pady=100, bg=self.canvas_right_table_color)
-        self.tab1.pack(side="left", fill="both", padx=10, pady=10, expand='true')
-        dark_mode_frame = tk.Frame(self.tab1, bg=self.canvas_right_table_color)
-        dark_mode_frame.grid(row=1, column=1)
+        self.TableReset()
+        frame = tk.Frame(self.table_frame, bg=self.canvas_right_table_color)
+        frame.grid(row=1, column=1)
+
 
 if __name__ == "__main__":
     # Create Datebase

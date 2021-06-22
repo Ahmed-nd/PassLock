@@ -2,7 +2,9 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 import SqlCmd
-from Backend import checkpasswd as cp
+from Backend import CheckPassword as cp
+
+
 class Login(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
@@ -15,12 +17,14 @@ class Login(tk.Frame):
         self.username = tk.StringVar()
         self.password = tk.StringVar()
         # ---------------------------frame1
-        self.frame1 = tk.Frame(self.master, bg="pale turquoise", relief="ridge")
+        self.frame1 = tk.Frame(
+            self.master, bg="pale turquoise", relief="ridge")
         self.frame1.pack(side="top", expand='true', fill='both', anchor='c')
         # ---------------------------title label
         self.title_label = tk.Label(self.frame1, text="Login", font="Impact 30 bold",
                                     bg="pale turquoise")
-        self.title_label.grid(row=1, column=0, columnspan=2, sticky='n', pady=40)
+        self.title_label.grid(
+            row=1, column=0, columnspan=2, sticky='n', pady=40)
         # ---------------------------image
         # Add image file
         self.img = tk.PhotoImage(file="images/logo.png")
@@ -30,17 +34,23 @@ class Login(tk.Frame):
         self.canvas.create_image(250, 60, image=self.img)
         # ---------------------------Program UI
         self.username_label = tk.Label(self.frame1, text="                                    Username:",
-                                           font="Arial 10 bold", bg="pale turquoise")
-        self.username_entry = tk.Entry(self.frame1, width=25, textvariable=self.username)
+                                       font="Arial 10 bold", bg="pale turquoise")
+        self.username_entry = tk.Entry(
+            self.frame1, width=25, textvariable=self.username)
         self.password_label = tk.Label(self.frame1, text="                                "
                                                          "    Password:", font=("Goudy old style", 10, "bold"),
                                        bg="pale turquoise")
-        self.password_entry = tk.Entry(self.frame1, width=25, show="*", textvariable=self.password)
+        self.password_entry = tk.Entry(
+            self.frame1, width=25, show="*", textvariable=self.password)
         # Grid on the screen
-        self.username_label.grid(row=2, column=0, columnspan=2, sticky='w', pady=10)
-        self.username_entry.grid(row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
-        self.password_label.grid(row=3, column=0, columnspan=2, sticky='w', pady=10)
-        self.password_entry.grid(row=3, column=1, columnspan=2, sticky='e', pady=10, padx=130)
+        self.username_label.grid(
+            row=2, column=0, columnspan=2, sticky='w', pady=10)
+        self.username_entry.grid(
+            row=2, column=1, columnspan=2, sticky='e', pady=10, padx=130)
+        self.password_label.grid(
+            row=3, column=0, columnspan=2, sticky='w', pady=10)
+        self.password_entry.grid(
+            row=3, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
         # Enter btn
         self.btn_reset_pass = tk.Button(self.frame1, text="Forgot your password?", font="Arial 10",
@@ -57,7 +67,7 @@ class Login(tk.Frame):
         # -------------------------------Events
         self.master.bind('<Return>', self.change_app)
 
-    def change_app(self, *_):   
+    def change_app(self, *_):
         # store the new password in Database
         password = SqlCmd.FetchAccountPassword(self.username.get())
         currPassword = self.password.get()
@@ -66,24 +76,29 @@ class Login(tk.Frame):
         if val:
             if password == currPassword:
                 self.master.destroy()
-                os.system('python application.py')
+                os.system('python Application.py')
         else:
             if whiceError is 1:
                 messagebox.showerror("PassLock", "length should be at least 8")
             elif whiceError is 2:
-                messagebox.showerror("PassLock", "length should be not be greater than 100")
+                messagebox.showerror(
+                    "PassLock", "length should be not be greater than 100")
             elif whiceError is 3:
-                messagebox.showerror("PassLock", "Password should have at least one numeral")
+                messagebox.showerror(
+                    "PassLock", "Password should have at least one numeral")
             elif whiceError is 4:
-                messagebox.showerror("PassLock", "Password should have at least one uppercase letter")
+                messagebox.showerror(
+                    "PassLock", "Password should have at least one uppercase letter")
             elif whiceError is 5:
-                messagebox.showerror("PassLock", "Password should have at least one lowercase letter")
+                messagebox.showerror(
+                    "PassLock", "Password should have at least one lowercase letter")
             elif whiceError is 6:
-                messagebox.showerror("PassLock", "Password should have at least one of the symbols $@#")
+                messagebox.showerror(
+                    "PassLock", "Password should have at least one of the symbols $@#")
 
     def change_reset(self):
         self.master.destroy()
-        os.system('python reset_password.py')
+        os.system('python ResetPassword.py')
 
 
 if __name__ == "__main__":
