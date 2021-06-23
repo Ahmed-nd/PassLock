@@ -1120,7 +1120,7 @@ class Application(tk.Frame):
             self.master.clipboard_append(field_value)
 
         top = tk.Toplevel()
-        top.title("PassLock || BackUp")
+        top.title("PassLock || Generate Password")
         top.iconbitmap("images\icon.ico")
         top.resizable(0, 0)
         top.geometry("+100+150")
