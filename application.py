@@ -52,7 +52,8 @@ class Application(tk.Frame):
         # ---------------------------frame right
         self.frame_right = tk.Frame(self.window)
         # ---------------------------Canvas right table
-        self.right_table_frame = tk.Frame(self.frame_right, bg=self.canvas_right_table_color)
+        self.right_table_frame = tk.Frame(
+            self.frame_right, bg=self.canvas_right_table_color)
         self.frame_left.pack(side="left", fill='both', anchor='c')
         self.frame_right.pack(side="left", expand='true',
                               fill='both', anchor='c')
@@ -71,28 +72,30 @@ class Application(tk.Frame):
         self.account_bg_color = []
         # ---------------------------Table Scrollbar
         # main Frame
-        self.table_main_frame = tk.Frame(self.right_table_frame, bg=self.canvas_right_table_color)
+        self.table_main_frame = tk.Frame(
+            self.right_table_frame, bg=self.canvas_right_table_color)
         self.table_main_frame.pack(fill="both", expand='true',)
         # Canvas for the scrollbar
         self.table_canvas = tk.Canvas(
             self.table_main_frame, bg=self.canvas_right_table_color)
         self.table_canvas.grid(row=0, column=0, sticky="nsew")
-        
-        # add scrollbar Y to canvas 
+
+        # add scrollbar Y to canvas
         self.scrollbarY = ttk.Scrollbar(
             self.table_main_frame, orient='vertical', command=self.table_canvas.yview)
         self.scrollbarY.grid(row=0, column=1, sticky="ns")
-        # add scrollbar X to canvas 
+        # add scrollbar X to canvas
         self.scrollbarX = ttk.Scrollbar(
             self.table_main_frame, orient='horizontal', command=self.table_canvas.xview)
         self.scrollbarX.grid(row=1, column=0, sticky="ew")
         # configure the canvas
-        self.table_canvas.configure(yscrollcommand=self.scrollbarY.set, xscrollcommand=self.scrollbarX.set)
+        self.table_canvas.configure(
+            yscrollcommand=self.scrollbarY.set, xscrollcommand=self.scrollbarX.set)
         self.table_canvas.bind('<Configure>', lambda e: self.table_canvas.configure(
             scrollregion=self.table_canvas.bbox("all")))
         self.table_canvas.bind_all('<MouseWheel>', lambda e: self.table_canvas.yview_scroll(
             int(-1*(e.delta/120)), "units"))
-        
+
         # the new frame
         self.table_frame = tk.Frame(
             self.table_canvas, bg=self.canvas_right_table_color)
@@ -272,23 +275,25 @@ class Application(tk.Frame):
         """ Reset the Home Table"""
         self.table_main_frame.destroy()
         # main Frame
-        self.table_main_frame = tk.Frame(self.right_table_frame, bg=self.canvas_right_table_color)
+        self.table_main_frame = tk.Frame(
+            self.right_table_frame, bg=self.canvas_right_table_color)
         self.table_main_frame.pack(fill="both", expand='true',)
         # Canvas for the scrollbar
         self.table_canvas = tk.Canvas(
             self.table_main_frame, bg=self.canvas_right_table_color)
         self.table_canvas.grid(row=0, column=0, sticky="nsew")
-        
-        # add scrollbar Y to canvas 
+
+        # add scrollbar Y to canvas
         self.scrollbarY = ttk.Scrollbar(
             self.table_main_frame, orient='vertical', command=self.table_canvas.yview)
         self.scrollbarY.grid(row=0, column=1, sticky="ns")
-        # add scrollbar X to canvas 
+        # add scrollbar X to canvas
         self.scrollbarX = ttk.Scrollbar(
             self.table_main_frame, orient='horizontal', command=self.table_canvas.xview)
         self.scrollbarX.grid(row=1, column=0, sticky="ew")
         # configure the canvas
-        self.table_canvas.configure(yscrollcommand=self.scrollbarY.set, xscrollcommand=self.scrollbarX.set)
+        self.table_canvas.configure(
+            yscrollcommand=self.scrollbarY.set, xscrollcommand=self.scrollbarX.set)
         self.table_canvas.bind('<Configure>', lambda e: self.table_canvas.configure(
             scrollregion=self.table_canvas.bbox("all")))
         self.table_canvas.bind_all('<MouseWheel>', lambda e: self.table_canvas.yview_scroll(
@@ -713,7 +718,7 @@ class Application(tk.Frame):
                         self.account_lst[search_indexs[curr_index]][3])
                     account_password_entry.grid(row=3, column=1, pady=2)
 
-                    account_text_label = tk.Label(entry_frame, text=" Secret Note :  ", font="Arial 14 bold",
+                    account_text_label = tk.Label(entry_frame, text="            Note :  ", font="Arial 14 bold",
                                                   bg=self.canvas_right_table_color)
                     account_text_label.grid(row=4, column=0, pady=2)
                     account_text_entry = tk.Text(entry_frame, width=30, height=10,
@@ -911,7 +916,7 @@ class Application(tk.Frame):
             self.account_password.set(self.account_lst[row][3])
             account_password_entry.grid(row=3, column=1, pady=2)
 
-            account_text_label = tk.Label(entry_frame, text=" Secret Note :  ", font="Arial 14 bold",
+            account_text_label = tk.Label(entry_frame, text="             Note :  ", font="Arial 14 bold",
                                           bg=self.canvas_right_table_color)
             account_text_label.grid(row=4, column=0, pady=2)
             account_text_entry = tk.Text(entry_frame, width=30, height=10,
@@ -1022,7 +1027,7 @@ class Application(tk.Frame):
         account_password_entry.grid(row=3, column=1, padx=20, pady=2)
 
         account_text_label = tk.Label(
-            entry_frame, text="     Secret Note :", font="Arial 14 bold", bg=self.canvas_right_table_color)
+            entry_frame, text="               Note :", font="Arial 14 bold", bg=self.canvas_right_table_color)
         account_text_label.grid(row=4, column=0, pady=2)
         account_text_entry = tk.Text(entry_frame, width=30, height=10,
                                      font="Arial 12 bold", relief='raised')
@@ -1119,7 +1124,7 @@ class Application(tk.Frame):
         top.iconbitmap("images\icon.ico")
         top.resizable(0, 0)
         top.geometry("+100+150")
-        
+
         top_frame = tk.Frame(top, padx=20, pady=20,
                              bg=self.canvas_right_table_color)
         top_frame.pack()
@@ -1155,7 +1160,8 @@ class Application(tk.Frame):
 
     def BackUp(self):
         from Backend import BackUp
-        import time 
+        import time
+
         def increment(*args):
             global btn, process_state, accounts
             for i in range(100):
@@ -1166,13 +1172,15 @@ class Application(tk.Frame):
                 else:
                     break
             if process_state:
-                self.folder_lst.append((f'Chrome{lastClickX}', 'View', 'Edit', 'Del'))
+                self.folder_lst.append(
+                    (f'Chrome{lastClickX}', 'View', 'Edit', 'Del'))
                 self.account_lst.extend(accounts)
+
         def fetch_fun(_):
             global btn, process_state, accounts
             try:
                 accounts = BackUp.FetchAccounts()
-                btn['state']='disabled'
+                btn['state'] = 'disabled'
             except:
                 messagebox.showerror(
                     "PassLock || BackUp Error", "There is something wrong on the user Chrome installation")
@@ -1182,24 +1190,22 @@ class Application(tk.Frame):
         top.iconbitmap("images\icon.ico")
         top.resizable(0, 0)
         top.geometry("+100+150")
-        
+
         top_frame = tk.Frame(top, padx=20, pady=20,
                              bg=self.canvas_right_table_color)
         top_frame.pack()
         top_label = tk.Label(top_frame, text="BackUp only work if you have\n Chrome in your device", font="Arial 8 bold",
-                                          bg=self.canvas_right_table_color, fg='red')
-        top_label.grid(row=3, column=0,columnspan=3, pady=30)
+                             bg=self.canvas_right_table_color, fg='red')
+        top_label.grid(row=3, column=0, columnspan=3, pady=30)
         p1 = ttk.Progressbar(top_frame, length=200, cursor='spider',
-                         mode="determinate",
-                         orient=tk.HORIZONTAL)
-        p1.grid(row=1,column=1)
+                             mode="determinate",
+                             orient=tk.HORIZONTAL)
+        p1.grid(row=1, column=1)
         global btn, process_state
         process_state = 1
-        btn = ttk.Button(top_frame,text="Start",command=increment)
-        btn.grid(row=1,column=0)
+        btn = ttk.Button(top_frame, text="Start", command=increment)
+        btn.grid(row=1, column=0)
         btn.bind('<Button-1>', fetch_fun)
-
-
 
 
 if __name__ == "__main__":
