@@ -1,13 +1,11 @@
 # tkinter/ ttk/ webbrowser
 import tkinter as tk
 import os
-
+import SqlCmd
 
 def save_password():
-    file = open('password.txt', 'r')
-    file.seek(0, 0)
-    content = file.read()
-    if content == '':
+    password = SqlCmd.FetchAccountPassword()
+    if password is None:
         os.system('python signup.py')
     else:
         os.system('python login.py')

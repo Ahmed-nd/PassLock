@@ -52,12 +52,12 @@ class Application(tk.Frame):
         # ---------------------------frame right
         self.frame_right = tk.Frame(self.window)
         # ---------------------------Canvas right table
-        self.right_table_frame = tk.Frame(self.frame_right)
+        self.right_table_frame = tk.Frame(self.frame_right, bg=self.canvas_right_table_color)
         self.frame_left.pack(side="left", fill='both', anchor='c')
         self.frame_right.pack(side="left", expand='true',
                               fill='both', anchor='c')
         self.right_table_frame.pack(
-            side="top", fill='both', anchor='c', padx=30, expand='true')
+            side="top", fill='both', anchor='c', expand='true')
 
         # database 1
         self.folder_lst = []
@@ -71,27 +71,35 @@ class Application(tk.Frame):
         self.account_bg_color = []
         # ---------------------------Table Scrollbar
         # main Frame
-        self.table_main_frame = tk.Frame(self.right_table_frame)
+        self.table_main_frame = tk.Frame(self.right_table_frame, bg=self.canvas_right_table_color)
         self.table_main_frame.pack(fill="both", expand='true',)
         # Canvas for the scrollbar
         self.table_canvas = tk.Canvas(
             self.table_main_frame, bg=self.canvas_right_table_color)
-        self.table_canvas.pack(side='left', fill="both", expand='true')
-        # add scrollbar to canvas
-        self.scrollbar = ttk.Scrollbar(
+        self.table_canvas.grid(row=0, column=0, sticky="nsew")
+        
+        # add scrollbar Y to canvas 
+        self.scrollbarY = ttk.Scrollbar(
             self.table_main_frame, orient='vertical', command=self.table_canvas.yview)
-        self.scrollbar.pack(side='right', fill="y")
+        self.scrollbarY.grid(row=0, column=1, sticky="ns")
+        # add scrollbar X to canvas 
+        self.scrollbarX = ttk.Scrollbar(
+            self.table_main_frame, orient='horizontal', command=self.table_canvas.xview)
+        self.scrollbarX.grid(row=1, column=0, sticky="ew")
         # configure the canvas
-        self.table_canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.table_canvas.configure(yscrollcommand=self.scrollbarY.set, xscrollcommand=self.scrollbarX.set)
         self.table_canvas.bind('<Configure>', lambda e: self.table_canvas.configure(
             scrollregion=self.table_canvas.bbox("all")))
         self.table_canvas.bind_all('<MouseWheel>', lambda e: self.table_canvas.yview_scroll(
             int(-1*(e.delta/120)), "units"))
+        
         # the new frame
         self.table_frame = tk.Frame(
-            self.table_canvas, pady=50, padx=70, bg=self.canvas_right_table_color)
+            self.table_canvas, bg=self.canvas_right_table_color)
         # display the table frame in the window canvas
         self.table_canvas.create_window((0, 0), window=self.table_frame)
+        self.table_main_frame.grid_rowconfigure(0, weight=1000)
+        self.table_main_frame.grid_columnconfigure(0, weight=1000)
 
         self.add_btn = tk.Button(self.table_frame)
         self.HomePage()
@@ -279,25 +287,33 @@ class Application(tk.Frame):
 
     def TableReset(self):
         self.table_main_frame.destroy()
-        self.table_main_frame = tk.Frame(self.right_table_frame)
+        # main Frame
+        self.table_main_frame = tk.Frame(self.right_table_frame, bg=self.canvas_right_table_color)
         self.table_main_frame.pack(fill="both", expand='true',)
         # Canvas for the scrollbar
         self.table_canvas = tk.Canvas(
             self.table_main_frame, bg=self.canvas_right_table_color)
-        self.table_canvas.pack(side='left', fill="both", expand='true')
-        # add scrollbar to canvas
-        self.scrollbar = ttk.Scrollbar(
+        self.table_canvas.grid(row=0, column=0, sticky="nsew")
+        
+        # add scrollbar Y to canvas 
+        self.scrollbarY = ttk.Scrollbar(
             self.table_main_frame, orient='vertical', command=self.table_canvas.yview)
-        self.scrollbar.pack(side='right', fill="y")
+        self.scrollbarY.grid(row=0, column=1, sticky="ns")
+        # add scrollbar X to canvas 
+        self.scrollbarX = ttk.Scrollbar(
+            self.table_main_frame, orient='horizontal', command=self.table_canvas.xview)
+        self.scrollbarX.grid(row=1, column=0, sticky="ew")
         # configure the canvas
-        self.table_canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.table_canvas.configure(yscrollcommand=self.scrollbarY.set, xscrollcommand=self.scrollbarX.set)
         self.table_canvas.bind('<Configure>', lambda e: self.table_canvas.configure(
             scrollregion=self.table_canvas.bbox("all")))
         self.table_canvas.bind_all('<MouseWheel>', lambda e: self.table_canvas.yview_scroll(
             int(-1*(e.delta/120)), "units"))
+        self.table_main_frame.grid_rowconfigure(0, weight=1000)
+        self.table_main_frame.grid_columnconfigure(0, weight=1000)
         # the new frame
         self.table_frame = tk.Frame(
-            self.table_canvas, pady=50, padx=20, bg=self.canvas_right_table_color)
+            self.table_canvas, bg=self.canvas_right_table_color)
         # display the table frame in the window canvas
         self.table_canvas.create_window((0, 0), window=self.table_frame)
 
