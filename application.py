@@ -23,7 +23,7 @@ def FindInList(find, lst):
 
 lastClickX = 0
 lastClickY = 0
-_, username,password = str(sys.argv)
+arg = str(sys.argv)
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -75,39 +75,22 @@ class Application(tk.Frame):
         # ---------------------------Table Scrollbar
         # main Frame
         self.table_main_frame = tk.Frame(
-            self.right_table_frame, bg=self.canvas_right_table_color)
-        self.table_main_frame.pack(fill="both", expand='true',)
+            self.right_table_frame)
         # Canvas for the scrollbar
-        self.table_canvas = tk.Canvas(
-            self.table_main_frame, bg=self.canvas_right_table_color)
-        self.table_canvas.grid(row=0, column=0, sticky="nsew")
-
+        self.table_canvas = None
         # add scrollbar Y to canvas
-        self.scrollbarY = ttk.Scrollbar(
-            self.table_main_frame, orient='vertical', command=self.table_canvas.yview)
-        self.scrollbarY.grid(row=0, column=1, sticky="ns")
+        self.scrollbarY = None
         # add scrollbar X to canvas
-        self.scrollbarX = ttk.Scrollbar(
-            self.table_main_frame, orient='horizontal', command=self.table_canvas.xview)
-        self.scrollbarX.grid(row=1, column=0, sticky="ew")
-        # configure the canvas
-        self.table_canvas.configure(
-            yscrollcommand=self.scrollbarY.set, xscrollcommand=self.scrollbarX.set)
-        self.table_canvas.bind('<Configure>', lambda e: self.table_canvas.configure(
-            scrollregion=self.table_canvas.bbox("all")))
-        self.table_canvas.bind_all('<MouseWheel>', lambda e: self.table_canvas.yview_scroll(
-            int(-1*(e.delta/120)), "units"))
-
+        self.scrollbarX = None
         # the new frame
-        self.table_frame = tk.Frame(
-            self.table_canvas, bg=self.canvas_right_table_color)
-        # display the table frame in the window canvas
-        self.table_canvas.create_window((0, 0), window=self.table_frame)
-        self.table_main_frame.grid_rowconfigure(0, weight=1000)
-        self.table_main_frame.grid_columnconfigure(0, weight=1000)
-
-        self.add_btn = tk.Button(self.table_frame)
+        self.table_frame = None
+        # configure the canvas
+        self.add_btn = None
         self.HomePage()
+        self.FolderTableRefresh()
+        
+
+        
 
     # GUI All the Application
     # ------------------------------------------------------------------------
@@ -240,12 +223,7 @@ class Application(tk.Frame):
         btn_enter.pack(pady=10)
         # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
         # fetch from database
-        self.folder_lst = [('Raj', 'View', 'Edit', 'Del'),
-                           ('Aaryan', 'View', 'Edit', 'Del'),
-                           ('Vaishnavi', 'View', 'Edit', 'Del'),
-                           ('Rachna', 'View', 'Edit', 'Del'),
-                           ('Rachna', 'View', 'Edit', 'Del'),
-                           ('Shubham', 'View', 'Edit', 'Del')]
+        self.folder_lst = [('Folder name', 'View', 'Edit', 'Del')]
         # if db_Fetch_folder_table:
         #     for i in range(len(db_Fetch_folder_table)):
         #         t = list(self.folder_lst[row])
@@ -271,7 +249,6 @@ class Application(tk.Frame):
         self.add_btn = tk.Button(self.table_frame, text="+", font="Arial 12 bold", border=2, width=2,
                                  relief='groove', bg="lawn green", activebackground='green2',
                                  command=self.InsertFolder, fg=self.font_color)
-        self.FolderTablePage()
 
     def TableReset(self):
         """ Reset the Home Table"""
@@ -315,7 +292,6 @@ class Application(tk.Frame):
         """
         show all the Folders in database
         """
-
         def Find(search):
             print('search:' + search)
             names_folderlst = [element[0].lower()
@@ -404,10 +380,14 @@ class Application(tk.Frame):
                                      bg="lawn green", activebackground='green2',
                                      command=add, )
                 edit_btn.grid(row=2, column=0, pady=2)
+                if len(self.folder_lst) < 2:
+                        delete_btn['state'] = 'disable'
             else:
                 messagebox.showerror(
                     "PassLock || Search error", "Folder name not found")
-
+        total_rows = len(self.folder_lst)
+        total_columns = len(self.folder_lst[0])
+        
         # floral white
         filename = tk.Label(self.table_frame, text="Folders:", width=10, bg=self.canvas_right_table_color,
                             font="Times 26 bold", )
@@ -427,8 +407,7 @@ class Application(tk.Frame):
                 e.grid(columnspan=3)
         del self.folder_lst_tkinter
         self.folder_lst_tkinter = []
-        total_rows = len(self.folder_lst)
-        total_columns = len(self.folder_lst[0])
+        
         for i in range(2, total_rows + 2):
             temp_tk = []
             e = tk.Label(self.table_frame, text=(i - 1), width=5, bg=self.frame_left_color, fg=self.font_color,
@@ -456,13 +435,14 @@ class Application(tk.Frame):
         self.add_btn = tk.Button(self.table_frame, text="+", font="Arial 12 bold", border=2, width=2,
                                  relief='groove', bg="lawn green", activebackground='green2',
                                  command=self.InsertFolder, )
-        self.add_btn.grid(row=total_rows + 1, column=total_columns + 3)
+        self.add_btn.grid(row=total_rows+1, column=total_columns+3)
 
     def FolderTableRefresh(self):
         """
         refresh the folders with new frame (new data)
         """
         self.TableReset()
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database for table 1--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         self.FolderTablePage()
 
     def FolderTableTools(self, row, column):
@@ -490,7 +470,6 @@ class Application(tk.Frame):
                 else:
                     messagebox.showerror(
                         "PassLock || Adding error", "Enter folder name")
-
             self.add_btn.destroy()
             self.add_btn = tk.Button(self.table_frame, text="+", font="Arial 12 bold", border=2, width=2,
                                      relief='groove', bg="lawn green", activebackground='green2',
@@ -507,19 +486,9 @@ class Application(tk.Frame):
             """
             get the folder's accounts database
             """
-            self.TableReset()
-            self.account_lst = [('Google', 'www.Google.com', 'go354', '123', 'Visit', 'View & Edit', 'Del'),
-                                ('Google', 'www.Google.com', 'go121',
-                                 '321', 'Visit', 'View & Edit', 'Del'),
-                                ('Facebook', 'www.Facebook.com', 'face12354',
-                                 '231', 'Visit', 'View & Edit', 'Del'),
-                                ('youtube', 'www.youtube.com', 'yo4453',
-                                 '132', 'Visit', 'View & Edit', 'Del'),
-                                ('youtube', 'www.youtube.com', 'yo4453',
-                                 '132', 'Visit', 'View & Edit', 'Del'),
-                                ('Coursera', 'www.Coursera.com', 'Cour1234', '312', 'Visit', 'View & Edit', 'Del')]
+            self.account_lst = [('Website', 'www.website.com', 'username', 'password', 'Visit', 'View & Edit', 'Del')]
             self.account_fold_name = self.folder_lst[row][0]
-            self.AccountTablePage()
+            self.AccountTableRefresh()
 
     def InsertFolder(self):
         """
@@ -557,8 +526,6 @@ class Application(tk.Frame):
                              bg=self.canvas_right_table_color)
         top_frame.pack()
 
-        self.add_btn.destroy()
-
         # Data Frame Entry
         entry_frame = tk.Frame(top_frame, padx=20, pady=20,
                                bg=self.canvas_right_table_color)
@@ -595,7 +562,6 @@ class Application(tk.Frame):
         """
                 show all the accounts in database folder
                 """
-
         def Find(search):
             print('search:' + search)
             websites = [element[0].lower() for element in self.account_lst]
@@ -739,11 +705,11 @@ class Application(tk.Frame):
                                            command=top.destroy, )
 
                     cancel_btn.grid(row=0, column=0, pady=2)
-                    add_btn = tk.Button(right_btn_frame, text=self.account_lst[search_indexs[curr_index]][6], font="Arial 12 bold",
+                    delete_btn = tk.Button(right_btn_frame, text=self.account_lst[search_indexs[curr_index]][6], font="Arial 12 bold",
                                         border=2, width=15,
                                         bg=self.account_bg_color[6], activebackground='antique white',
                                         command=delete_fun, relief='groove')
-                    add_btn.grid(row=1, column=0, pady=2)
+                    delete_btn.grid(row=1, column=0, pady=2)
                     # left side btn add/cancel
                     left_btn_frame = tk.Frame(
                         top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
@@ -766,6 +732,8 @@ class Application(tk.Frame):
                         next_btn['state'] = 'disable'
                     else:
                         next_btn['state'] = 'normal'
+                    if len(self.account_lst) < 2:
+                        delete_btn['state'] = 'disable'
                 top_page()
             else:
                 messagebox.showerror("PassLock", "Folder name not found")
@@ -824,6 +792,7 @@ class Application(tk.Frame):
         refresh the folders with new frame (new data)
         """
         self.TableReset()
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database for table 1--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         self.AccountTablePage()
 
     def AccountsTableTools(self, row, column):
@@ -878,7 +847,7 @@ class Application(tk.Frame):
                 else:
                     messagebox.showerror(
                         "PassLock || Viewing and editing account error", "Please Enter the data")
-
+            
             # Data Frame Entry
             entry_frame = tk.Frame(
                 top_frame, padx=20, pady=20, bg=self.canvas_right_table_color)
@@ -989,8 +958,6 @@ class Application(tk.Frame):
         self.account_url = tk.StringVar()
         self.account_username = tk.StringVar()
         self.account_password = tk.StringVar()
-
-        self.add_btn.destroy()
 
         # Data Frame Entry
         entry_frame = tk.Frame(top_frame, padx=20, pady=20,
