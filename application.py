@@ -222,27 +222,21 @@ class Application(tk.Frame):
                               bg=self.frame_left_color, activebackground=self.frame_left_color)
         btn_enter.pack(pady=10)
         # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-        # fetch from database
         self.folder_lst = [('Folder name', 'View', 'Edit', 'Del')]
-        # if db_Fetch_folder_table:
-        #     for i in range(len(db_Fetch_folder_table)):
-        #         t = list(self.folder_lst[row])
-        #         t[i] = name
-        #         self.folder_lst[row] = tuple(t)
-        # Vaiables for Folder
-        self.folder_lst_tkinter = []
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database from table 2--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        self.folder_lst_tkinter = None
         self.folder_lst_wid = [30, 10, 10, 10]
-        self.folder_name = tk.StringVar()
+        self.folder_name = None
         self.folder_bg_color = ['light cyan',
                                 'royal blue', 'lawn green', 'firebrick1']
         # Vaiables for account
-        self.account_lst = []
-        self.account_fold_name = ''
+        self.account_lst = None
+        self.account_fold_name = None
         self.account_lst_wid = [15, 20, 15, 15, 10, 20, 10]
-        self.account_web = tk.StringVar()
-        self.account_url = tk.StringVar()
-        self.account_username = tk.StringVar()
-        self.account_password = tk.StringVar()
+        self.account_web = None
+        self.account_url = None
+        self.account_username = None
+        self.account_password = None
         self.account_bg_color = ['light cyan', 'light cyan', 'light cyan',
                                  'light cyan', 'royal blue', 'lawn green', 'firebrick1']
         # add btn
@@ -442,7 +436,7 @@ class Application(tk.Frame):
         refresh the folders with new frame (new data)
         """
         self.TableReset()
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database for table 1--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database from table 1--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         self.FolderTablePage()
 
     def FolderTableTools(self, row, column):
@@ -792,7 +786,7 @@ class Application(tk.Frame):
         refresh the folders with new frame (new data)
         """
         self.TableReset()
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database for table 1--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database from table 2--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         self.AccountTablePage()
 
     def AccountsTableTools(self, row, column):
