@@ -38,7 +38,7 @@ class Login(tk.Frame):
         self.username_entry = tk.Entry(
             self.frame1, width=25, textvariable=self.username)
         self.password_label = tk.Label(self.frame1, text="                                "
-                                                         "    Password:", font=("Goudy old style", 10, "bold"),
+                                                         "     Password:", font=("Goudy old style", 10, "bold"),
                                        bg="pale turquoise")
         self.password_entry = tk.Entry(
             self.frame1, width=25, show="*", textvariable=self.password)
@@ -57,7 +57,13 @@ class Login(tk.Frame):
                                         bg='pale turquoise',
                                         command=self.change_reset, activebackground='pale turquoise', activeforeground="blue2",
                                         border="0")
-        self.btn_reset_pass.grid(row=4, column=0, columnspan=2, pady=7)
+        self.btn_reset_pass.grid(row=4, column=0, columnspan=2, pady=7,)
+
+        self.btn_signup_pass = tk.Button(self.frame1, text="Signup", font="Arial 10",
+                                        bg='pale turquoise',
+                                        command=self.change_signup, activebackground='pale turquoise', activeforeground="blue2",
+                                        border="0")
+        self.btn_signup_pass.grid(row=6, column=0, columnspan=2, pady=7)
 
         self.btn_enter = tk.Button(self.frame1, text="Enter", font="Arial 10 bold", width=7,
                                    bg="#0001a7", fg='white', command=self.change_app,
@@ -69,12 +75,12 @@ class Login(tk.Frame):
 
     def change_app(self, *_):
         # store the new password in Database
-        password = SqlCmd.FetchAccountPassword(self.username.get())
+        # password = SqlCmd.FetchAccountPassword(self.username.get())
         currPassword = self.password.get()
         # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         val, whiceError = cp.password_check(currPassword)
         if val:
-            if password == currPassword:
+            if True == currPassword:
                 self.master.destroy()
                 os.system('python Application.py')
         else:
@@ -99,6 +105,9 @@ class Login(tk.Frame):
     def change_reset(self):
         self.master.destroy()
         os.system('python ResetPassword.py')
+    def change_signup(self):
+        self.master.destroy()
+        os.system('python Signup.py')
 
 
 if __name__ == "__main__":
