@@ -237,8 +237,8 @@ class Application(tk.Frame):
         btn_enter = tk.Button(self.frame_left, text="About", command=lambda link=about_url: OpenURL(link), font="Arial 10 bold", border=0, fg=self.font_color,
                               bg=self.frame_left_color, activebackground=self.frame_left_color)
         btn_enter.pack(pady=10)
-        # database 1
         # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+        # fetch from database
         self.folder_lst = [('Raj', 'View', 'Edit', 'Del'),
                            ('Aaryan', 'View', 'Edit', 'Del'),
                            ('Vaishnavi', 'View', 'Edit', 'Del'),
@@ -533,6 +533,7 @@ class Application(tk.Frame):
             print("add")
             folder_name = self.folder_name.get()
             if folder_name != '':
+                
                 temp_lst = [folder_name, self.folder_lst[0][1],
                             self.folder_lst[0][2], self.folder_lst[0][3]]
                 temp_lst = tuple(temp_lst)
