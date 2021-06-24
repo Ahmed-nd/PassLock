@@ -29,28 +29,29 @@ class Application(tk.Frame):
         tk.Frame.__init__(self, master)
         self.master = master
         self.master.geometry("1500x700+20+60")
+        self.master.title("PassLock")
+        self.master.iconbitmap("images\icon.ico")
         # self.master.state('zoomed')
         # -------------------------------
         self.close_button = tk.Button()
         self.expand_button = tk.Button()
         self.minimize_button = tk.Button()
         self.title_bar_title = tk.Label()
-        self.window = tk.Canvas(self.master)
+        # self.window = tk.Canvas(self.master)
 
-        self.TitleBar()
+        # self.TitleBar()
         self.frame_left_color = "gray12"
         self.frame_right_color = "gray12"
         self.canvas_right_table_color = "gray70"
         self.font_color = 'thistle1'
         self.master.configure(bg=self.canvas_right_table_color)
-
         # self.master.state('zoomed')
         # ------------------------Application private variable
 
         # ---------------------------frame left
-        self.frame_left = tk.Frame(self.window)
+        self.frame_left = tk.Frame(self.master)
         # ---------------------------frame right
-        self.frame_right = tk.Frame(self.window)
+        self.frame_right = tk.Frame(self.master)
         # ---------------------------Canvas right table
         self.right_table_frame = tk.Frame(
             self.frame_right, bg=self.canvas_right_table_color)
