@@ -75,14 +75,15 @@ class Login(tk.Frame):
 
     def change_app(self, *_):
         # store the new password in Database
-        # password = SqlCmd.FetchAccountPassword(self.username.get())
+        username = self.username.get()
         currPassword = self.password.get()
         # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         val, whiceError = cp.password_check(currPassword)
         if val:
-            if True == currPassword:
+            checkPassword = SqlCmd.FetchAccountPassword(self.username.get())
+            if currPassword == checkPassword:
                 self.master.destroy()
-                os.system('python Application.py')
+                os.system(f'python Application.py {username} {currPassword}')
         else:
             if whiceError is 1:
                 messagebox.showerror("PassLock", "length should be at least 8")

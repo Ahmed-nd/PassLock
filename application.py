@@ -1,3 +1,4 @@
+import sys
 import tkinter as tk
 import webbrowser
 from tkinter.messagebox import showinfo
@@ -22,7 +23,7 @@ def FindInList(find, lst):
 
 lastClickX = 0
 lastClickY = 0
-
+_, username,password = str(sys.argv)
 
 class Application(tk.Frame):
     def __init__(self, master=None):
