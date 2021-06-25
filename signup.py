@@ -1,7 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import messagebox
-import SqlCmd
+import db
 from Backend import CheckPassword as cp
 
 
@@ -73,36 +73,36 @@ class Signup(tk.Frame):
         self.master.bind('<Return>', self.change)
 
     def change(self, *_):
+        username = self.username.get()
         new_password = self.new_password.get()
         confirm = self.confirm.get()
         val, whiceError = cp.password_check(new_password)
         if val:
             if new_password == confirm:
                 # store the new password in Database
-                # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-                SqlCmd.InsertIntoAccount(
-                    self.username.get(), new_password, 1, 1)
-                # change file
+                db.InsertIntoAccount(f"'{username}'", f"'{new_password}'")
+                # change file "'ahmed'"
                 self.master.destroy()
-                os.system('python Login.py')
+                db.CloseConn()
+                os.system('python login.py')
             else:
                 messagebox.showerror("PassLock", "The password Doesn't match")
         else:
-            if whiceError is 1:
+            if whiceError == 1:
                 messagebox.showerror("PassLock", "length should be at least 8")
-            elif whiceError is 2:
+            elif whiceError == 2:
                 messagebox.showerror(
                     "PassLock", "length should be not be greater than 100")
-            elif whiceError is 3:
+            elif whiceError == 3:
                 messagebox.showerror(
                     "PassLock", "Password should have at least one numeral")
-            elif whiceError is 4:
+            elif whiceError == 4:
                 messagebox.showerror(
                     "PassLock", "Password should have at least one uppercase letter")
-            elif whiceError is 5:
+            elif whiceError == 5:
                 messagebox.showerror(
                     "PassLock", "Password should have at least one lowercase letter")
-            elif whiceError is 6:
+            elif whiceError == 6:
                 messagebox.showerror(
                     "PassLock", "Password should have at least one of the symbols $@#")
 

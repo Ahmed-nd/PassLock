@@ -1,7 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import messagebox
-import SqlCmd
+import db
 from Backend import CheckPassword as cp
 
 
@@ -38,7 +38,7 @@ class Login(tk.Frame):
         self.username_entry = tk.Entry(
             self.frame1, width=25, textvariable=self.username)
         self.password_label = tk.Label(self.frame1, text="                                "
-                                                         "     Password:", font=("Goudy old style", 10, "bold"),
+                                                         "     Password:", font="Arial 10 bold",
                                        bg="pale turquoise")
         self.password_entry = tk.Entry(
             self.frame1, width=25, show="*", textvariable=self.password)
@@ -53,11 +53,6 @@ class Login(tk.Frame):
             row=3, column=1, columnspan=2, sticky='e', pady=10, padx=130)
 
         # Enter btn
-        self.btn_reset_pass = tk.Button(self.frame1, text="Forgot your password?", font="Arial 10",
-                                        bg='pale turquoise',
-                                        command=self.change_reset, activebackground='pale turquoise', activeforeground="blue2",
-                                        border="0")
-        self.btn_reset_pass.grid(row=4, column=0, columnspan=2, pady=7,)
 
         self.btn_signup_pass = tk.Button(self.frame1, text="Signup", font="Arial 10",
                                         bg='pale turquoise',
@@ -80,34 +75,38 @@ class Login(tk.Frame):
         # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         val, whiceError = cp.password_check(currPassword)
         if val:
-            checkPassword = SqlCmd.FetchAccountPassword(self.username.get())
-            if currPassword == checkPassword:
-                self.master.destroy()
-                os.system(f'python Application.py {username} {currPassword}')
+            checkPassword = db.Fetchall("account")
+            print(checkPassword)
+            for i in range(len(checkPassword)):
+                if username== checkPassword[i][0] and currPassword == checkPassword[i][1]:
+                    self.master.destroy()
+                    db.CloseConn()
+                    os.system(f'python Application.py {username} {currPassword}')
+
+            messagebox.showerror("PassLock", "Invalid Username or Password")
+            
         else:
-            if whiceError is 1:
+            if whiceError == 1:
                 messagebox.showerror("PassLock", "length should be at least 8")
-            elif whiceError is 2:
+            elif whiceError == 2:
                 messagebox.showerror(
                     "PassLock", "length should be not be greater than 100")
-            elif whiceError is 3:
+            elif whiceError == 3:
                 messagebox.showerror(
                     "PassLock", "Password should have at least one numeral")
-            elif whiceError is 4:
+            elif whiceError == 4:
                 messagebox.showerror(
                     "PassLock", "Password should have at least one uppercase letter")
-            elif whiceError is 5:
+            elif whiceError == 5:
                 messagebox.showerror(
                     "PassLock", "Password should have at least one lowercase letter")
-            elif whiceError is 6:
+            elif whiceError == 6:
                 messagebox.showerror(
                     "PassLock", "Password should have at least one of the symbols $@#")
 
-    def change_reset(self):
-        self.master.destroy()
-        os.system('python ResetPassword.py')
     def change_signup(self):
         self.master.destroy()
+        db.CloseConn()
         os.system('python Signup.py')
 
 
@@ -116,3 +115,4 @@ if __name__ == "__main__":
     app = Login(form)
     # Adjust size
     form.mainloop()
+    db.CloseConn()

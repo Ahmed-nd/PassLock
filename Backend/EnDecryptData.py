@@ -61,4 +61,3 @@ def main():
     decrypted = decrypt(encrypted, password)
     print(bytes.decode(decrypted))
 
-main()

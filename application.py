@@ -1,11 +1,13 @@
 import sys
 import tkinter as tk
+from tkinter.constants import N
 import webbrowser
 from tkinter.messagebox import showinfo
+from Backend import EnDecryptData as ED
 from tkinter import Text, messagebox
 from tkinter import ttk
 import search
-import SqlCmd
+import db
 
 
 def OpenURL(self):
@@ -23,7 +25,7 @@ def FindInList(find, lst):
 
 lastClickX = 0
 lastClickY = 0
-arg = str(sys.argv)
+arg = list(sys.argv)
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -307,13 +309,14 @@ class Application(tk.Frame):
                 def add():
                     print("add")
                     folder_name = self.folder_name.get()
-                    if folder_name != '':
-                        t = list(self.folder_lst[curr_index])
-                        t[0] = folder_name
+                    names_folderlst = [element[0] for element in self.folder_lst if element[0] == folder_name]
+                    print(names_folderlst)
+                    if folder_name != '' and len(names_folderlst) == 0:
+                        oldFolderName = self.folder_lst[curr_index][0]
+                        db.UpdateFolderName(f"'{arg[1]}'",f"'{oldFolderName}'",f"'{folder_name}'")
                         # store Note in the database
                         # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
                         top.destroy()
-                        self.folder_lst[curr_index] = tuple(t)
                         self.FolderTableRefresh()
 
                     else:
@@ -435,8 +438,25 @@ class Application(tk.Frame):
         """
         refresh the folders with new frame (new data)
         """
+       
         self.TableReset()
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database from table 1--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        folder_items = []
+        
+        FolderItemsRaw =db.FetchFolders(f"'{arg[1]}'")
+        
+        for i in range (len(FolderItemsRaw)):
+            folder_items.append(FolderItemsRaw[i][0])
+
+        folder_items = set(folder_items)
+        print(folder_items)
+        if len(folder_items) > 0: 
+            self.folder_lst =[]
+            self.folder_lst_tkinter = []
+            self.folder_name = tk.StringVar()
+            for i in folder_items:
+                self.folder_lst.append((f'{i}', 'View', 'Edit', 'Del'))
+            print(self.folder_lst)
         self.FolderTablePage()
 
     def FolderTableTools(self, row, column):
@@ -447,7 +467,7 @@ class Application(tk.Frame):
         """
         print(row, column)
         if column == 3:
-            del self.folder_lst[row]
+            db.RemoveFolderFromAppAccount(f"'{self.folder_lst[row][0]}'",f"'{arg[1]}'")
             self.FolderTableRefresh()
         elif column == 2:
             del self.folder_name
@@ -456,10 +476,11 @@ class Application(tk.Frame):
             def add():
                 print("add")
                 name = self.folder_name.get()
-                if name != '':
-                    t = list(self.folder_lst[row])
-                    t[0] = name
-                    self.folder_lst[row] = tuple(t)
+                names_folderlst = [element[0] for element in self.folder_lst if element[0] != name]
+                print(names_folderlst)
+                if name != '' and name not in names_folderlst:
+                    oldFolderName = self.folder_lst[row][0]
+                    db.UpdateFolderName(f"'{arg[1]}'",f"'{oldFolderName}'",f"'{name}'")
                     self.FolderTableRefresh()
                 else:
                     messagebox.showerror(
@@ -495,17 +516,15 @@ class Application(tk.Frame):
 
         def add():
             print("add")
+            
             folder_name = self.folder_name.get()
-            if folder_name != '':
-                
-                temp_lst = [folder_name, self.folder_lst[0][1],
-                            self.folder_lst[0][2], self.folder_lst[0][3]]
-                temp_lst = tuple(temp_lst)
-                self.folder_lst.append(temp_lst)
+            Folders_data = [element[0] for element in self.folder_lst]
+            if folder_name != '' and folder_name not in Folders_data:
+                db.InsertIntoAppAccount("'Website'", "'www.website.com'", "'Username'", "'Password'","'Note'",f"'{folder_name}'",f"'{arg[1]}'")
                 top.destroy()
             else:
                 messagebox.showerror(
-                    "PassLock || Adding error", "Please Enter the data")
+                    "PassLock || Adding error", "Error Invalid Folder Name")
             self.FolderTableRefresh()
 
         def cancel_fun():
@@ -567,22 +586,18 @@ class Application(tk.Frame):
                 def add():
                     print("add")
                     global account_text_entry
-                    web = self.account_web.get()
-                    url = self.account_url.get()
-                    username = self.account_username.get()
+                    web = self.account_lst[search_indexs[curr_index]][0]
+                    url = self.account_lst[search_indexs[curr_index]][1]
+                    username = self.account_lst[search_indexs[curr_index]][2]
                     password = self.account_password.get()
                     Note = account_text_entry.get('1.0', tk.END)
                     print(Note)
                     if web != '' and username != '' and password != '' and url != '' and Note != '':
-                        t = list(self.account_lst[search_indexs[curr_index]])
-                        t[0] = web
-                        t[1] = url
-                        t[2] = username
-                        t[3] = password
                         # store Note in the database
+                        encrypt_pass = ED.encrypt(password, arg[2])
+                        db.UpdateAppAccount(f"'{encrypt_pass['cipher_text']}'",f"'{Note}'",f"'{web}'",f"'{username}'",f"'{self.account_fold_name}'",f"'{arg[1]}'")
                         # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
                         top.destroy()
-                        self.account_lst[search_indexs[curr_index]] = tuple(t)
                         self.AccountTableRefresh()
                     else:
                         messagebox.showerror(
@@ -618,9 +633,6 @@ class Application(tk.Frame):
                     top_frame = tk.Frame(
                         top, padx=20, pady=20, bg=self.canvas_right_table_color)
                     top_frame.pack()
-                    self.account_web = tk.StringVar()
-                    self.account_url = tk.StringVar()
-                    self.account_username = tk.StringVar()
                     self.account_password = tk.StringVar()
 
                     # next and previous Buttons
@@ -644,31 +656,26 @@ class Application(tk.Frame):
                     account_web_label = tk.Label(entry_frame, text="       Website :  ", font="Arial 14 bold",
                                                  bg=self.canvas_right_table_color)
                     account_web_label.grid(row=0, column=0, pady=2)
-                    account_web_entry = tk.Entry(entry_frame, width=30,
-                                                 font="Arial 12 bold",
-                                                 textvariable=self.account_web)
-                    self.account_web.set(
-                        self.account_lst[search_indexs[curr_index]][0])
+                    account_web_entry = tk.Label(entry_frame,text=self.account_lst[search_indexs[curr_index]][0], width=30,
+                                                 font="Arial 12 bold",bg=self.canvas_right_table_color
+                                                 )
                     account_web_entry.grid(row=0, column=1, pady=2)
 
                     account_url_label = tk.Label(entry_frame, text="              URL :  ", font="Arial 14 bold",
                                                  bg=self.canvas_right_table_color)
                     account_url_label.grid(row=1, column=0, pady=2)
-                    account_url_entry = tk.Entry(entry_frame, width=30,
-                                                 font="Arial 12 bold",
-                                                 textvariable=self.account_url)
-                    self.account_url.set(
-                        self.account_lst[search_indexs[curr_index]][1])
+                    account_url_entry = tk.Label(entry_frame, width=30,text=self.account_lst[search_indexs[curr_index]][1],
+                                                 font="Arial 12 bold",bg=self.canvas_right_table_color
+                                                 )
                     account_url_entry.grid(row=1, column=1, pady=2)
 
                     account_username_label = tk.Label(entry_frame, text="   Username :  ", font="Arial 14 bold",
                                                       bg=self.canvas_right_table_color)
                     account_username_label.grid(row=2, column=0, pady=2)
-                    account_username_entry = tk.Entry(entry_frame, width=30,
-                                                      font="Arial 12 bold",
-                                                      textvariable=self.account_username)
-                    self.account_username.set(
-                        self.account_lst[search_indexs[curr_index]][2])
+                    account_username_entry = tk.Label(entry_frame, width=30,text=self.account_lst[search_indexs[curr_index]][2],
+                                                      font="Arial 12 bold",bg=self.canvas_right_table_color
+                                                      )
+ 
                     account_username_entry.grid(row=2, column=1, pady=2)
 
                     account_password_label = tk.Label(entry_frame, text="   Password :  ", font="Arial 14 bold",
@@ -686,8 +693,12 @@ class Application(tk.Frame):
                     account_text_label.grid(row=4, column=0, pady=2)
                     account_text_entry = tk.Text(entry_frame, width=30, height=10,
                                                  font="Arial 12 bold", relief='raised')
+
+                    AppName = self.account_lst[search_indexs[curr_index]][0]
+                    UserName = self.account_lst[search_indexs[curr_index]][2]
+                    NoteDB = db.FetchNote(AppName,UserName,self.account_fold_name,arg[1])
                     account_text_entry.insert(
-                        '1.0', "get data from the database")
+                        '1.0', NoteDB)
                     account_text_entry.grid(row=4, column=1, pady=5)
 
                     # right side btn add/cancel
@@ -787,6 +798,14 @@ class Application(tk.Frame):
         """
         self.TableReset()
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$--database from table 2--$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        account_items = db.FetchAccount(f"'{arg[1]}'",f"'{self.account_fold_name}'")
+        print(account_items)
+        if len(account_items) > 0: 
+            self.account_lst =[]
+            #self.folder_lst_tkinter = []
+            for i in account_items:
+                decrypt_pass = ED.decrypt(i[3], arg[2])
+                self.account_lst.append((f'{i[0]}',f'{i[1]}', f'{i[2]}',f'{bytes.decode(decrypt_pass)}','View', 'Edit', 'Del'))
         self.AccountTablePage()
 
     def AccountsTableTools(self, row, column):
@@ -798,7 +817,10 @@ class Application(tk.Frame):
         print(row, column)
         if column == 6:
             # delete record
-            del self.account_lst[row]
+            web=self.account_lst[row][0]
+            username=self.account_lst[row][2]
+            db.RemoveAppFromAppAccount(f"'{web}'",f"'{username}'",f"'{self.account_fold_name}'",f"'{arg[1]}'")
+            
             self.AccountTableRefresh()
         elif column == 5:
             # Edit record
@@ -821,22 +843,19 @@ class Application(tk.Frame):
 
             def add():
                 print("add")
-                web = self.account_web.get()
-                url = self.account_url.get()
-                username = self.account_username.get()
+                web = self.account_lst[row][0]
+                url = self.account_lst[row][1]
+                username = self.account_lst[row][2]
                 password = self.account_password.get()
                 Note = account_text_entry.get('1.0', tk.END)
                 print(Note)
                 if web != '' and username != '' and password != '' and url != '':
-                    t = list(self.account_lst[row])
-                    t[0] = web
-                    t[1] = url
-                    t[2] = username
-                    t[3] = password
-                    # store Note in the database
+                    
+                    encrypt_pass = ED.encrypt(password, arg[2])
+                    db.UpdateAppAccount(f"'{encrypt_pass['cipher_text']}'",f"'{Note}'",f"'{web}'",f"'{username}'",f"'{self.account_fold_name}'",f"'{arg[1]}'")
                     # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
                     top.destroy()
-                    self.account_lst[row] = tuple(t)
+                  
                     self.AccountTableRefresh()
                 else:
                     messagebox.showerror(
@@ -849,28 +868,24 @@ class Application(tk.Frame):
             account_web_label = tk.Label(entry_frame, text="       Website :  ", font="Arial 14 bold",
                                          bg=self.canvas_right_table_color)
             account_web_label.grid(row=0, column=0, pady=2)
-            account_web_entry = tk.Entry(entry_frame, width=30,
-                                         font="Arial 12 bold",
-                                         textvariable=self.account_web)
-            self.account_web.set(self.account_lst[row][0])
+            account_web_entry = tk.Label(entry_frame, width=30,
+                                         font="Arial 12 bold",bg=self.canvas_right_table_color,
+                                         text=self.account_lst[row][0])
             account_web_entry.grid(row=0, column=1, pady=2)
 
             account_url_label = tk.Label(entry_frame, text="              URL :  ", font="Arial 14 bold",
                                          bg=self.canvas_right_table_color)
             account_url_label.grid(row=1, column=0, pady=2)
-            account_url_entry = tk.Entry(entry_frame, width=30,
-                                         font="Arial 12 bold",
-                                         textvariable=self.account_url)
-            self.account_url.set(self.account_lst[row][1])
+            account_url_entry = tk.Label(entry_frame, width=30,
+                                         font="Arial 12 bold",bg=self.canvas_right_table_color,
+                                         text=self.account_lst[row][1])
             account_url_entry.grid(row=1, column=1, pady=2)
 
             account_username_label = tk.Label(entry_frame, text="   Username :  ", font="Arial 14 bold",
                                               bg=self.canvas_right_table_color)
             account_username_label.grid(row=2, column=0, pady=2)
-            account_username_entry = tk.Entry(entry_frame, width=30,
-                                              font="Arial 12 bold",
-                                              textvariable=self.account_username)
-            self.account_username.set(self.account_lst[row][2])
+            account_username_entry = tk.Label(entry_frame, width=30,text=self.account_lst[row][2],
+                                              font="Arial 12 bold",bg=self.canvas_right_table_color,)
             account_username_entry.grid(row=2, column=1, pady=2)
 
             account_password_label = tk.Label(entry_frame, text="   Password :  ", font="Arial 14 bold",
@@ -887,7 +902,12 @@ class Application(tk.Frame):
             account_text_label.grid(row=4, column=0, pady=2)
             account_text_entry = tk.Text(entry_frame, width=30, height=10,
                                          font="Arial 12 bold", relief='raised')
-            account_text_entry.insert('1.0', "get data from the database")
+
+
+            AppName = self.account_lst[row][0]
+            UserName = self.account_lst[row][2]
+            NoteDB = db.FetchNote(AppName,UserName,self.account_fold_name,arg[1])
+            account_text_entry.insert('1.0', NoteDB)
             account_text_entry.grid(row=4, column=1, pady=5)
             #  btn add/cancel
             btn_frame = tk.Frame(top_frame, padx=20, pady=20,
@@ -926,10 +946,8 @@ class Application(tk.Frame):
             Note = account_text_entry.get('1.0', tk.END)
             print(Note)
             if web != '' and username != '' and password != '' and url != '':
-                temp_lst = [web, url, username, password, self.account_lst[0][4], self.account_lst[0][5],
-                            self.account_lst[0][6]]
-                temp_lst = tuple(temp_lst)
-                self.account_lst.append(temp_lst)
+                encrypt_pass = ED.encrypt(password, arg[2])
+                db.InsertIntoAppAccount(f"'{web}'",f"'{url}'",f"'{username}'",f"'{encrypt_pass['cipher_text']}'",f"'{Note}'",f"'{self.account_fold_name}'",f"'{arg[1]}'")
                 top.destroy()
             else:
                 messagebox.showerror(
@@ -1123,9 +1141,8 @@ class Application(tk.Frame):
     # ------------------------------------------------------------------------
 
     def BackUp(self):
-        from Backend import BackUp
         import time
-
+        from Backend import BackUp
         def increment(*args):
             global btn, process_state, accounts
             for i in range(100):
@@ -1136,15 +1153,15 @@ class Application(tk.Frame):
                 else:
                     break
             if process_state:
-                self.folder_lst.append(
-                    (f'Chrome{lastClickX}', 'View', 'Edit', 'Del'))
-                self.account_lst.extend(accounts)
+                self.FolderTableRefresh()
 
         def fetch_fun(_):
             global btn, process_state, accounts
             try:
-                accounts = BackUp.FetchAccounts()
                 btn['state'] = 'disabled'
+                new_accounts = BackUp.FetchAccounts()
+                for account in new_accounts:
+                    accounts = db.InsertIntoAppAccount(f"'{account[0]}'",f"'{account[1]}'",f"'{account[2]}'",f"'{account[3]}'","'Write your note here'","'Chrome Backup'",f"'{arg[1]}'")
             except:
                 messagebox.showerror(
                     "PassLock || BackUp Error", "There is something wrong on the user Chrome installation")
